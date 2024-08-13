@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A simple boilerplate HTML page.">
     <title>Audio Level Meter</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
@@ -14,18 +16,18 @@
 </head>
     
 <body>
-    
-    <header>
-        
-        <h1>Temporary Header</h1>
-        
-    </header>
 
     <main>
 
-        <button id="refresh">REFRESH</button>
+        <h1 id="decibels">- -</h1>
 
-        <p id="decibels">- -</p>
+        <div id="graph_container">
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+
+        <button id="connect">CONNECT</button>
+        <button id="play">PLAY</button>
+        <button id="pause">PAUSE</button>
         
     </main>
     
