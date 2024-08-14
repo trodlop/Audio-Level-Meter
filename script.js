@@ -156,7 +156,7 @@ let Decibels; // Array for storing frequency intensity (calculated from frequenc
 let mediaStream; // Object to store audio stream being captured by microphone
 
 let calibration = 0; // Default calibration
-let w = "z"
+let w = "a"
 
 const audioContext = new (window.AudioContext || window.AudioContext)();
 const analyser = audioContext.createAnalyser();
