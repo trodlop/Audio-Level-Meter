@@ -13,3 +13,10 @@ body {
     height: 70vh;
     width: 90vw;
 }
+
+@media (max-width: 600px) {
+    #graph_container {
+        height: 50vh;
+        width: 90vw;
+    }
+}
