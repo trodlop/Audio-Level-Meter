@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple boilerplate HTML page.">
+    <title>Audio Level Meter</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    
+</head>
+    
+<body>
+
+    <main id="main_body">
+
+        <div id="visualiser_container">
+
+            <canvas id="visualiser"></canvas>
+
+        </div>
+
+        <div id="meter_container" class="center_h">
+
+            <h1 id="decibels">- -</h1>
+
+        </div>
+
+        <div id="calibration_container">
+
+            <h1 id="calibration_heading">
+                CALIBRATION
+            </h1>
+
+            <h1 id="calibration">+ 0.0</h1>
+
+            <div id="calibration_controls">
+                <input type="range" id="calibration_slider" min="-50" max="50" step="0.1" value="0">
+            </div>
+
+        </div>
+
+        <div id="controls_container">
+
+            <div class="center_h center_v">
+
+                <button id="refresh">
+                    <img id="refresh_img" class="controls_img" src="icons/refresh.png" alt="REFRESH">
+                </button>
+
+            </div>
+
+            <div class="center_h center_v">
+
+                <button id="play" class="center_h center_v">
+                    <img id="play_pause" src="icons/play.svg" alt="PLAY">
+                </button>
+
+            </div>
+
+            <div class="center_h center_v">
+
+                <button id="settings">
+                    <a id="settings_anchor" href="settings.html">
+                        <img id="settings_img" class="controls_img" src="icons/settings.png" alt="SETTINGS">
+                    </a>
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+    
+</body>
+    
+</html>
