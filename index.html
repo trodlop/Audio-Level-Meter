@@ -19,19 +19,25 @@
 
     <main id="main_body">
 
-        <div id="visualiser_container">
+        <div id="visualiser_container" class="container_template">
 
             <canvas id="visualiser"></canvas>
 
         </div>
 
-        <div id="meter_container" class="center_h">
+        <div id="meter_container" class="container_template center_h">
 
-            <h1 id="decibels">- -</h1>
+            <div id="meter_container2">
+                <canvas id="meter" height="100" width="400"></canvas>
+                <div id="meter_arrow"></div>
+            </div>
+
+
+            <h1 id="decibels">0.0 dB</h1>
 
         </div>
 
-        <div id="calibration_container">
+        <div id="calibration_container" class="container_template">
 
             <h1 id="calibration_heading">
                 CALIBRATION
@@ -45,7 +51,7 @@
 
         </div>
 
-        <div id="controls_container">
+        <div id="controls_container" class="container_template">
 
             <div class="center_h center_v">
 
