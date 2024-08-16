@@ -151,66 +151,6 @@ var visualiser = new Chart(ctx, {
     }
 });
 
-// Code block for drawing VU meter reading (uses mean average intensity (fixed))
-const meter = document.getElementById("meter");
-
-var m_ctx = meter.getContext('2d');
-const meter_arrow = document.getElementById("meter_arrow")
-
-function draw_meter() {
-
-    let width = meter.width;
-    let height = meter.height;
-    m_ctx.font = '20px sans-serif';
-
-    // Calculate x coordinates for each vertical line
-    let x0 = 10;
-    let x2 = ((width - 20) * 0.1) + 7;
-    let x1 = ((width - 20) * 0.2) + 7;
-    let x3 = ((width - 20) * 0.3) + 7;
-    let x4 = ((width - 20) * 0.4) + 7;
-    let x5 = ((width - 20) * 0.5) + 7;
-    let x6 = ((width - 20) * 0.6) + 7;
-    let x7 = ((width - 20) * 0.7) + 7;
-    let x8 = ((width - 20) * 0.8) + 7;
-    let x9 = ((width - 20) * 0.9) + 7;
-    let x10 = (width) - 15;
-
-    // Red and yellow danger areas
-    
-    m_ctx.fillStyle = 'rgb(255, 255, 0)';   
-    m_ctx.fillRect(x6, height - 30, width - x8, 20); // Yellow
-    m_ctx.fillStyle = 'rgb(180, 0, 0)';
-    m_ctx.fillRect(x8, height - 30, width - x8 - 15, 20);   // Red
-
-    // Bottom Line
-    m_ctx.fillStyle = 'rgb(0, 0, 0)';
-    m_ctx.fillRect(10, height - 15, width - 20, 5);
-
-    // Vertical lines 0 - 10
-    m_ctx.fillRect(x0, height - 40, 5, 30);
-    m_ctx.fillRect(x1, height - 40, 5, 30);
-    m_ctx.fillRect(x2, height - 40, 5, 30);
-    m_ctx.fillRect(x3, height - 40, 5, 30);
-    m_ctx.fillRect(x4, height - 40, 5, 30);
-    m_ctx.fillRect(x5, height - 40, 5, 30);
-    m_ctx.fillRect(x6, height - 40, 5, 30);
-    m_ctx.fillRect(x7, height - 40, 5, 30);
-    m_ctx.fillRect(x8, height - 40, 5, 30);
-    m_ctx.fillRect(x9, height - 40, 5, 30);
-    m_ctx.fillRect(x10, height - 40, 5, 30);
-
-    // Numbers 0, 50, 100
-    m_ctx.fillText("0", x0, 50);
-    m_ctx.fillText("50", x5 - 9, 50);
-    m_ctx.fillText("100", x10 - 20, 50);
-
-    
-};
-
-// Draws meter when the page loads and whenever page gets resized
-window.onload = draw_meter(); 
-window.onresize = draw_meter();
 // ------------------------------------------------------------------------------------------------------------------
 
 let array; // Array for temporary use case
@@ -219,7 +159,7 @@ let Decibels; // Array for storing frequency intensity (calculated from frequenc
 let mediaStream = null; // Object to handle incoming audio data from microphone
 let capture_interval_id = null; // To store the interval ID
 
-let display_type = "max"; // "mean" = mean average intensity, "mean_trimmed" = mean average while eliminating any outlying intensities, "max" = maximum value
+let display_type = "mean"; // "mean" = mean average intensity, "mean_trimmed" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
 let calibration = 0; // Default calibration
 let w = "itu"; // "a" = A Weighting, "itu" = ITU R 468 Weighting, "z" = Z (zero) Weighting
@@ -366,23 +306,33 @@ function update_graph() {
 
 };
 
+let width = 0;
+
+// Calculates width of meter display
+function calc_meter_width() {
+    
+    width = document.body.clientWidth * 0.2;
+    
+};
+
+// Recalculates width of the meter display when ever window gets refreshed or resized
+window.onload = calc_meter_width; 
+window.onresize = calc_meter_width; 
+
 // Updates the VU meter showing average sound level
 function update_meter_display() {
-
-    let width = window.innerWidth * 0.233; // Caluculates the width of the meter display with respect to viewport width
     
     if (average <= 0) {
-        meter_arrow.style.left = "0.9vw"
+        meter_arrow.style.left = "0.8vw"
     }
     else if (average >= 100) {
-        meter_arrow.style.left = "24.2vw"
+        meter_arrow.style.left = "18.8vw"
     }
     else {
-        x = (100 / width) * average
-        meter_arrow.style.left = `${x + 0.9}vw`
-    }
-
-};
+        x = 0.182 * average
+        meter_arrow.style.left = `${x + 0.6}vw`
+    };
+}; 
 
 // Updates the display showing sound level
 function update_decibels_display() {
