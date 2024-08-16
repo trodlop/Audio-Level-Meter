@@ -198,10 +198,10 @@ h1 {
 }
 
 #settings_img {
-    max-height: 40px;
-    max-width: 40px;
-    height: 4vw;
-    width: 4vw;
+    max-height: 45px;
+    max-width: 45px;
+    height: 5vw;
+    width: 5vw;
 }
 
 @media (max-width: 800px) {
