@@ -328,10 +328,8 @@ h1 {
 
 @media (max-width: 500px) {
     #play {
-        max-height: 100px;
-        max-width: 100px;
-        height: 100px;
-        width: 100px;
+        height: 80px;
+        width: 80px;
         margin-left: 20px;
         margin-right: 20px;
         border: 4px solid rgb(145, 145, 145);
@@ -340,9 +338,17 @@ h1 {
     }
     
     #play_pause {
-        max-height: 50px;
-        max-width: 50px;
-        height: 50px;
-        width: 50px;
+        height: 40px;
+        width: 40px;
+    }
+    
+    #refresh_img {
+        height: 40px;
+        width: 40px;
+    }
+
+    #settings_img {
+        height: 40px;
+        width: 40px;
     }
 }
