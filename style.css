@@ -12,6 +12,7 @@ a {
 button {
     border: none;
     background-color: white;
+    -webkit-appearance:none
 }
 
 h1 {
