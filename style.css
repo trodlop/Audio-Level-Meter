@@ -212,7 +212,7 @@ h1 {
     #main_body {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: minmax(10px, 40vh) minmax(10px, 100px) minmax(10px, 100px) minmax(10px, 100px);
+        grid-template-rows: minmax(10px, 40vh) minmax(10px, 100px) minmax(10px, 100px) minmax(10px, 150px);
     }
 
     #visualiser_container {
