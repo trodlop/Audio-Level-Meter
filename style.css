@@ -41,7 +41,7 @@ h1 {
 #visualiser_container {
     grid-column: 1/2;
     grid-row: 1/4;
-    height: 88vh;
+    height: 90vh;
     margin: 2.5vw;
     margin-bottom: 0px;
     border-radius: 20px;
