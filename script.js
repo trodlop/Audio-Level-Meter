@@ -159,7 +159,7 @@ let Decibels; // Array for storing frequency intensity (calculated from frequenc
 let mediaStream = null; // Object to handle incoming audio data from microphone
 let capture_interval_id = null; // To store the interval ID
 
-let display_type = "mean"; // "mean" = mean average intensity, "mean_trimmed" = mean average while eliminating any outlying intensities, "max" = maximum value
+let display_type = "max"; // "mean" = mean average intensity, "mean_trimmed" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
 let calibration = 0; // Default calibration
 let w = "itu"; // "a" = A Weighting, "itu" = ITU R 468 Weighting, "z" = Z (zero) Weighting
