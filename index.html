@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple boilerplate HTML page.">
+    <title>Audio Level Meter</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    
+</head>
+    
+<body>
+
+    <main id="main_body">
+
+        <div id="visualiser_container" class="container_template">
+
+            <canvas id="visualiser"></canvas>
+
+        </div>
+
+        <div id="meter_container" class="container_template center_h">
+
+            <div id="meter_container2">
+                <img id="meter" src="icons/VU_meter.svg" alt="METER">
+                <div id="meter_alignment" class="center_h">
+                    <div id="meter_alignment2">
+                        <div id="meter_arrow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 id="decibels">0.0 dB</h1>
+
+        </div>
+
+        <div id="calibration_container" class="container_template">
+
+            <div id="calibration_container2">
+
+                <h1 id="calibration_heading">
+                    CALIBRATION:
+                </h1>
+    
+                <h1 id="calibration">+ 0.0</h1>
+
+            </div>
+
+            
+
+            <div id="calibration_controls">
+                <input type="range" id="calibration_slider" min="-50" max="50" step="0.1" value="0">
+            </div>
+
+        </div>
+
+        <div id="controls_container" class="container_template">
+
+            <div class="center_h center_v">
+
+                <div id="refresh">
+                    <img id="refresh_img" class="controls_img" src="icons/refresh.svg" alt="REFRESH">
+                </div>
+
+            </div>
+
+            <div class="center_h center_v">
+
+                <div id="play" class="center_h center_v">
+                    <img id="play_pause" src="icons/play.svg" alt="PLAY">
+                </div>
+
+            </div>
+
+            <div class="center_h center_v">
+
+                <div id="settings">
+                    <a id="settings_anchor" href="settings/index.html">
+                        <img id="settings_img" class="controls_img" src="icons/settings.svg" alt="SETTINGS">
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+    
+</body>
+    
+</html>
