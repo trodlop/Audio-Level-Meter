@@ -1,0 +1,117 @@
+.prevent_select { /* Removes text cursor over text elements */
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    /* background-color: rgb(240, 235, 194); */
+    background-color: rgb(170, 162, 162);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 30px;
+}
+
+h3 {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: gray;
+}
+
+p {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+.settings_h2 {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    color: rgb(60, 60, 60);
+}
+
+.settings_options_template {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings_options_hidden {
+    display: none;
+    width: 85vw;
+}
+
+.settings_options_separator {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.settings_options_separator_sub {
+    background-color: #797979;
+    height: 5px;
+    width: 90vw;
+}
+
+.settings_options_sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90vw;
+    padding-left: 2.5vw;
+    padding-right: 2.5vw;
+}
+
+.settings_options_sub:hover {
+    background-color: rgb(213, 213, 213);
+}
+
+.settings_option_container_template {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.settings_options_button_template {
+    height: 15px;
+    width: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    border-radius: 50%;
+    border: 2px solid rgb(72, 72, 72);
+    background-color: white;
+}
+
+#settings_main_heading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#settings_main_options {
+    width: 95vw;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(50px, fit-content) 5px minmax(50px, fit-content) 5px minmax(50px, fit-content);
+    border-radius: 5px;
+    border: 5px solid black;
+}    
+
+
+@media (max-width: 800px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
