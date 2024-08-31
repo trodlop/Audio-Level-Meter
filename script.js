@@ -195,6 +195,7 @@ if (visualiser_type == "intensity spectrum") {
     });
 }
 else if (visualiser_type == "spectrogram") {
+    visualiser_container.style.backgroundColor = "rgb(0,0,100)"
     canvas.style.backgroundColor = "rgb(0,0,100)"
     spectrogram_resize()
     update_spectrogram()
