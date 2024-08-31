@@ -1,3 +1,19 @@
+// Makes sure that local storage settings have been initialised
+function initialise_settings() {
+    if (localStorage.getItem("display_type") === null) {
+        localStorage.setItem("display_type","max");
+    };
+
+    if (localStorage.getItem("weighting") === null) {
+        localStorage.setItem("weighting","a");
+    };
+
+    if (localStorage.getItem("visualiser_type") === null) {
+        localStorage.setItem("visualiser_type","intensity spectrum");
+    };
+};
+document.addEventListener("DOMContentLoaded",initialise_settings);
+
 const option1 = document.getElementById("settings_option1_sub");
 const option1_hidden = document.getElementById("settings_option1_hidden");
 const option1_preview = document.getElementById("settings_h3_option1");
