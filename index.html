@@ -21,7 +21,7 @@
 
         <div id="visualiser_container" class="container_template">
 
-            <canvas id="visualiser"></canvas>
+            <canvas id="visualiser" width="800" height="512"></canvas>
 
         </div>
 
@@ -91,15 +91,15 @@
         </div>
 
     </main>
-
-    <script>
-        window.addEventListener("pageshow", function(event) {
-            if (event.persisted) {
-                window.location.reload();
-            };
-        });
-    </script>
     
+<script>
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        };
+    });
+</script>
+
 </body>
     
 </html>
