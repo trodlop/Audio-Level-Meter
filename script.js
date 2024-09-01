@@ -234,8 +234,8 @@ function update_spectrogram() {
             var intensity = array[y];  // Keep using the same intensity for all x at the same y
 
                 imageData.data[index * 4] = intensity * 255;                // Red
-                imageData.data[index * 4 + 1] = (intensity ** 2) * 150;            // Green
-                imageData.data[index * 4 + 2] = (1 - intensity) * 50 + 50;      // Blue
+                imageData.data[index * 4 + 1] = (intensity ** 3) * 255;            // Green
+                imageData.data[index * 4 + 2] = ((intensity - 0.44) ** 6) * 5000 + 50;      // Blue
                 imageData.data[index * 4 + 3] = 255;                        // Alpha
         }
     }
