@@ -2,22 +2,22 @@ const decibels_display = document.getElementById("decibels");
 const calibration_display = document.getElementById("calibration");
 
 const visualiser_container = document.getElementById("visualiser_container");
+const spectrogram_axis = document.getElementById("spectrogram_x_axis");
 
 let array; // Array for temporary use case
 let frequencyData; // Array storing frequency data directly from AudioAPI
-let Decibels = [ 
-    -Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity,-Infinity
-]; // Array for storing frequency intensity (calculated from frequencyData array)
+let Decibels = []; // Array for storing frequency intensity (calculated from frequencyData array)
 let normalized_data_array = []; // Array for storing normalised frequency intensity
 let mediaStream = null; // Object to handle incoming audio data from microphone
 let capture_interval_id = null; // To store the interval ID
 
-let display_type = localStorage.getItem("display_type"); // "mean" = mean average intensity, "trimmed mean" = mean average while eliminating any outlying intensities, "max" = maximum value
+const display_type = localStorage.getItem("display_type"); // "mean" = mean average intensity, "trimmed mean" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
 let calibration = 0; // Default calibration
-let w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU R 468 Weighting, "z" = Z (zero) Weighting
+const w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU R 468 Weighting, "z" = Z (zero) Weighting
 
-let refresh_interval = localStorage.getItem("time_interval");
+const refresh_interval = localStorage.getItem("time_interval");
+const spectrogram_refresh = localStorage.getItem("spectrogram_refresh");
 
 document.getElementById('refresh').addEventListener('click', function() {
     location.reload();
@@ -45,6 +45,9 @@ function initialise_settings() {
     };
     if (localStorage.getItem("time_interval") === null) {
         localStorage.setItem("time_interval",100); // 500, 200, 100
+    };
+    if (localStorage.getItem("spectrogram_refresh") === null) {
+        localStorage.setItem("spectrogram_refresh",5); // 3, 5, 10
     };
 
 };
@@ -195,10 +198,23 @@ if (visualiser_type == "intensity spectrum") {
     });
 }
 else if (visualiser_type == "spectrogram") {
-    visualiser_container.style.backgroundColor = "rgb(0,0,100)"
-    canvas.style.backgroundColor = "rgb(0,0,100)"
-    spectrogram_resize()
-    update_spectrogram()
+    visualiser_container.style.backgroundColor = "rgb(0,0,100)";
+    spectrogram_axis.style.display = "block"
+    canvas.style.backgroundColor = "rgb(0,0,100)";
+    canvas.style.margin = "0px";
+    canvas.style.marginTop = "20px";
+
+    if (spectrogram_refresh == 3) {
+        spectrogram_axis.src = "icons/spectrogram_axis/axis_3.svg"
+    } 
+    else if (spectrogram_refresh == 5) {
+        spectrogram_axis.src = "icons/spectrogram_axis/axis_5.svg"
+    }
+    else if (spectrogram_refresh == 10) {
+        spectrogram_axis.src = "icons/spectrogram_axis/axis_10.svg"
+    };
+
+    spectrogram_resize();
 }
 else if (visualiser_type == "waveform") {
     console.log("waveform not available yet");
@@ -212,8 +228,10 @@ function spectrogram_resize() {
     let height = visualiser_container.offsetHeight;
     let width = visualiser_container.offsetWidth;
 
-    canvas.style.height = `${height * 0.9}px`;
+    canvas.style.height = `${height * 0.85}px`;
     canvas.style.width = `${width * 0.95}px`;
+
+    spectrogram_axis.style.width = `${width * 0.95}px`;
 };
 
 window.addEventListener("resize",spectrogram_resize)
@@ -231,15 +249,33 @@ function update_spectrogram() {
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
             var index = y * width + x;
-            var intensity = array[y];  // Keep using the same intensity for all x at the same y
+            var intensity = array[height - y - 1];  // Keep using the same intensity for all x at the same y
 
-            imageData.data[index * 4] = (intensity * 60000) ** 0.5;                // Red
-            //imageData.data[index * 4] = intensity * 255;
-            imageData.data[index * 4 + 1] = (intensity ** 3) * 255;            // Green
-            imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;      // Blue
-            imageData.data[index * 4 + 3] = 255;                        // Alpha
-        }
-    }
+            // Purple - Orange
+            // imageData.data[index * 4] = intensity * 400;                            // Red
+            // imageData.data[index * 4 + 1] = intensity * 150;                        // Green
+            // imageData.data[index * 4 + 2] = (1 - intensity) * 50 + 50;              // Blue
+            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
+
+            // Purple - Red - White
+            // imageData.data[index * 4] = (intensity * 60000) ** 0.5;                 // Red
+            // imageData.data[index * 4 + 1] = (intensity ** 3) * 255;                 // Green
+            // imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;        // Blue
+            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
+
+            // Purple - Red - White
+            imageData.data[index * 4] = intensity * 255;                            // Red
+            imageData.data[index * 4 + 1] = (intensity ** 3) * 255;                 // Green
+            imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;        // Blue
+            imageData.data[index * 4 + 3] = 255;                                    // Alpha
+
+            // Black - White
+            // imageData.data[index * 4] = intensity * 255;                            // Red
+            // imageData.data[index * 4 + 1] = intensity * 255;                        // Green
+            // imageData.data[index * 4 + 2] = intensity * 255;                        // Blue
+            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
+        };
+    };
 
     // Draw the new slice on the right side of the canvas
     ctx.putImageData(imageData, canvas.width - width, 0);
@@ -392,7 +428,7 @@ function apply_weighting() {
 };
 
 let counter = 0 // Counter for visualiser timing
-// Updates data in the graph
+// Updates data in the visualiser (graph, spectrogram, etc.)
 function update_visualiser() {
 
     if (visualiser_type == "intensity spectrum") {
@@ -407,7 +443,7 @@ function update_visualiser() {
         else {
             counter += 1
         };
-        if (counter >= 3) {
+        if (counter >= spectrogram_refresh) {
             counter = 0
         };
     }
@@ -481,3 +517,18 @@ calibrationSlider.addEventListener('input', function() {
         calibration_display.innerText = `+ ${calibration.toFixed(1)}`;
     }
 });
+
+
+
+
+
+//TODO          Add settings for:
+//TODO                              spectrogram update time 
+//TODO                              spectrogram colouring 
+//TODO                              intensity spectrum axis scale (logarithmic/linear)
+//TODO                              
+
+
+
+
+//?             Maybe change meter reading to be maximum instead of mean?
