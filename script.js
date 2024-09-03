@@ -18,6 +18,7 @@ const w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU
 
 const refresh_interval = localStorage.getItem("time_interval");
 const spectrogram_refresh = localStorage.getItem("spectrogram_refresh");
+const spectrogram_colour = localStorage.getItem("spectrogram_colour");
 
 document.getElementById('refresh').addEventListener('click', function() {
     location.reload();
@@ -33,25 +34,32 @@ const calibrate_down = document.getElementById("calibrate_down");
 // Initialises all of the settings information in local storage:
 function initialise_settings() {
     if (localStorage.getItem("display_type") === null) {
-        localStorage.setItem("display_type","max");
+        localStorage.setItem("display_type","max"); // max, mean, trimmed mean
     };
-
     if (localStorage.getItem("weighting") === null) {
-        localStorage.setItem("weighting","a");
+        localStorage.setItem("weighting","a"); // itu r, a, c, z
     };
-
     if (localStorage.getItem("visualiser_type") === null) {
-        localStorage.setItem("visualiser_type","intensity spectrum");
+        localStorage.setItem("visualiser_type","intensity spectrum"); // intensity spectrum, spectrogram, waveform, softmax
     };
     if (localStorage.getItem("time_interval") === null) {
         localStorage.setItem("time_interval",100); // 500, 200, 100
     };
+    if (localStorage.getItem("intensity_spectrum_colour") === null) {
+        localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan, #c70000 = red
+    };
+    if (localStorage.getItem("intensity_spectrum_axis") === null) {
+        localStorage.setItem("intensity_spectrum_axis","logarithmic"); // logarithmic, linear
+    };
+    if (localStorage.getItem("spectrogram_colour") === null) {
+        localStorage.setItem("spectrogram_colour","blue-red-white"); // blue-red-white, black-white
+    };
     if (localStorage.getItem("spectrogram_refresh") === null) {
         localStorage.setItem("spectrogram_refresh",5); // 3, 5, 10
     };
-
+    console.log("Settings initialised");
 };
-document.addEventListener("DOMContentLoaded",initialise_settings);
+initialise_settings();
 
 // Array to store all different frequency intervals (bins) (in Hz)
 const frequency_bins = [
@@ -90,7 +98,7 @@ if (visualiser_type == "intensity spectrum") {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
                 ], // Decibel values for each frequency bin
                 backgroundColor: 'rgba(255, 255, 255, 0)',
-                borderColor: '#008EFF',
+                borderColor: localStorage.getItem("intensity_spectrum_colour"),
                 borderWidth: 1.5, // Make the line thicker
                 pointRadius: 0, // Remove the circle markers
                 fill: true
@@ -108,7 +116,7 @@ if (visualiser_type == "intensity spectrum") {
             },
             scales: {
                 x: {
-                    type: 'logarithmic', // Set the x-axis to logarithmic
+                    type: localStorage.getItem("intensity_spectrum_axis"),
                     position: 'bottom',
                     ticks: {
                         callback: function(value, index, values) { // Displays X axis labels from custom pushed ticks
@@ -131,47 +139,71 @@ if (visualiser_type == "intensity spectrum") {
                         // Clear all pregenerated ticks
                         axis.ticks = [];
 
-                        // Manually push only wanted ticks (essentially the vertical grid lines):
-
-                        // Array of tick values and whether they are major ticks
-                        const tickValues = [
-                            { value: 100, major: true },
-                            { value: 200, major: false },
-                            { value: 300, major: false },
-                            { value: 400, major: false },
-                            { value: 500, major: true },
-                            { value: 600, major: false },
-                            { value: 700, major: false },
-                            { value: 800, major: false },
-                            { value: 900, major: false },
-                            { value: 1000, major: true },
-                            { value: 2000, major: true },
-                            { value: 3000, major: false },
-                            { value: 4000, major: true },
-                            { value: 5000, major: false },
-                            { value: 6000, major: false },
-                            { value: 7000, major: false },
-                            { value: 8000, major: true },
-                            { value: 9000, major: false },
-                            { value: 10000, major: false },
-                            { value: 16000, major: true },
-                            { value: 20000, major: false }
-                        ];
+                        // Manually push only wanted ticks (essentially the vertical grid lines):                        
 
                         // Iterate over the array and add ticks
-                        for (let i = 0; i < tickValues.length; i++) {
-                            axis.ticks.push({
-                                value: tickValues[i].value,
-                                major: tickValues[i].major,
-                            });
+                        if (localStorage.getItem("intensity_spectrum_axis") == "logarithmic") {
+                            const tickValues = [
+                                { value: 100, major: true },
+                                { value: 200, major: false },
+                                { value: 300, major: false },
+                                { value: 400, major: false },
+                                { value: 500, major: true },
+                                { value: 600, major: false },
+                                { value: 700, major: false },
+                                { value: 800, major: false },
+                                { value: 900, major: false },
+                                { value: 1000, major: true },
+                                { value: 2000, major: true },
+                                { value: 3000, major: false },
+                                { value: 4000, major: true },
+                                { value: 5000, major: false },
+                                { value: 6000, major: false },
+                                { value: 7000, major: false },
+                                { value: 8000, major: true },
+                                { value: 9000, major: false },
+                                { value: 10000, major: false },
+                                { value: 16000, major: true },
+                                { value: 20000, major: false }
+                            ];
+                            for (let i = 0; i < tickValues.length; i++) {
+                                axis.ticks.push({
+                                    value: tickValues[i].value,
+                                    major: tickValues[i].major,
+                                });
+                            };
+                        }
+                        else if (localStorage.getItem("intensity_spectrum_axis") == "linear") {
+                            const tickValues = [
+                                { value: 100, major: true },
+                                { value: 1000, major: true },
+                                { value: 2000, major: true },
+                                { value: 3000, major: false },
+                                { value: 4000, major: true },
+                                { value: 5000, major: false },
+                                { value: 6000, major: false },
+                                { value: 7000, major: false },
+                                { value: 8000, major: true },
+                                { value: 9000, major: false },
+                                { value: 10000, major: false },
+                                { value: 16000, major: true },
+                                { value: 20000, major: false }
+                            ];
+                            for (let i = 0; i < tickValues.length; i++) {
+                                axis.ticks.push({
+                                    value: tickValues[i].value,
+                                    major: tickValues[i].major,
+                                });
+                            };
                         };
+                        
                     },
 
                     
                     min: 100, // Set the minimum value for the x-axis
                     max: 22050, // Set the maximum value for the x-axis
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.3)', // Adjust the color and opacity
+                        color: 'rgba(0, 0, 0, 0.3)',
                         borderColor: '#333',
                         borderWidth: 1,
                         lineWidth: 1
@@ -198,9 +230,28 @@ if (visualiser_type == "intensity spectrum") {
     });
 }
 else if (visualiser_type == "spectrogram") {
-    visualiser_container.style.backgroundColor = "rgb(0,0,100)";
+    if (spectrogram_colour == "blue-red-white") {
+        visualiser_container.style.backgroundColor = "rgb(0,0,100)";
+        canvas.style.backgroundColor = "rgb(0,0,100)";
+    }
+    else if (spectrogram_colour == "purple-orange") {
+        visualiser_container.style.backgroundColor = "rgb(35,0,100)";
+        canvas.style.backgroundColor = "rgb(35,0,100)";
+    }
+    else if (spectrogram_colour == "red-blue-green") {
+        visualiser_container.style.backgroundColor = "rgb(0,0,0)";
+        canvas.style.backgroundColor = "rgb(0,0,0)";
+    }
+    else if (spectrogram_colour == "red-green") {
+        visualiser_container.style.backgroundColor = "rgb(0,0,0)";
+        canvas.style.backgroundColor = "rgb(0,0,0)";
+    }
+    else if (spectrogram_colour == "black-white") {
+        visualiser_container.style.backgroundColor = "rgb(0,0,0)";
+        canvas.style.backgroundColor = "rgb(0,0,0)";
+    };
+    
     spectrogram_axis.style.display = "block"
-    canvas.style.backgroundColor = "rgb(0,0,100)";
     canvas.style.margin = "0px";
     canvas.style.marginTop = "20px";
 
@@ -251,29 +302,41 @@ function update_spectrogram() {
             var index = y * width + x;
             var intensity = array[height - y - 1];  // Keep using the same intensity for all x at the same y
 
-            // Purple - Orange
-            // imageData.data[index * 4] = intensity * 400;                            // Red
-            // imageData.data[index * 4 + 1] = intensity * 150;                        // Green
-            // imageData.data[index * 4 + 2] = (1 - intensity) * 50 + 50;              // Blue
-            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
-
-            // Purple - Red - White
-            // imageData.data[index * 4] = (intensity * 60000) ** 0.5;                 // Red
-            // imageData.data[index * 4 + 1] = (intensity ** 3) * 255;                 // Green
-            // imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;        // Blue
-            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
-
-            // Purple - Red - White
-            imageData.data[index * 4] = intensity * 255;                            // Red
-            imageData.data[index * 4 + 1] = (intensity ** 3) * 255;                 // Green
-            imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;        // Blue
-            imageData.data[index * 4 + 3] = 255;                                    // Alpha
-
-            // Black - White
-            // imageData.data[index * 4] = intensity * 255;                            // Red
-            // imageData.data[index * 4 + 1] = intensity * 255;                        // Green
-            // imageData.data[index * 4 + 2] = intensity * 255;                        // Blue
-            // imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            if (spectrogram_colour == "blue-red-white") {
+                // Blue- Red - White
+                imageData.data[index * 4] = intensity * 255;                            // Red
+                imageData.data[index * 4 + 1] = (intensity ** 3) * 255;                 // Green
+                imageData.data[index * 4 + 2] = ((intensity) ** 10) * 150 + 100;        // Blue
+                imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            }
+            else if (spectrogram_colour == "purple-orange") {
+                // Purple - Orange
+                imageData.data[index * 4] = intensity * 220 + 35;                       // Red
+                imageData.data[index * 4 + 1] = intensity * 150;                        // Green
+                imageData.data[index * 4 + 2] = (1 - intensity) * 50 + 50;              // Blue
+                imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            }
+            else if (spectrogram_colour == "red-blue-green") {
+                // Red - Blue - Green
+                imageData.data[index * 4] = -1500 * ((intensity - 0.40) ** 2) + 200     // Red
+                imageData.data[index * 4 + 1] = -1000 * ((intensity - 1) ** 2) + 255;   // Green
+                imageData.data[index * 4 + 2] = -1000 * ((intensity - 0.7) ** 2) + 200; // Blue
+                imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            }
+            else if (spectrogram_colour == "red-green") {
+                // Red - Green
+                imageData.data[index * 4] = -1500 * ((intensity - 0.40) ** 2) + 200     // Red
+                imageData.data[index * 4 + 1] = -1000 * ((intensity - 1) ** 2) + 255;   // Green
+                imageData.data[index * 4 + 2] = 0;                                      // Blue
+                imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            }
+            else if (spectrogram_colour == "black-white") {
+                // Black - White
+                imageData.data[index * 4] = intensity * 255;                            // Red
+                imageData.data[index * 4 + 1] = intensity * 255;                        // Green
+                imageData.data[index * 4 + 2] = intensity * 255;                        // Blue
+                imageData.data[index * 4 + 3] = 255;                                    // Alpha
+            }
         };
     };
 
@@ -523,10 +586,10 @@ calibrationSlider.addEventListener('input', function() {
 
 
 //TODO          Add settings for:
-//TODO                              spectrogram update time 
-//TODO                              spectrogram colouring 
-//TODO                              intensity spectrum axis scale (logarithmic/linear)
-//TODO                              
+//TODO                              changing refresh rate of audio capture (100ms, 200ms, 500ms)
+
+//TODO          Link main page to portfolio website
+//TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
 
 
 
