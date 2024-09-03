@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
+    <link rel="icon" type="image/x-icon" href="../icons/favicon.svg">
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     
@@ -27,7 +28,7 @@
         <div class="settings_options_template" id="settings_option1">
 
             <div class="settings_options_sub" id="settings_option1_sub">
-                <h2 class="settings_h2 prevent_select">VISUALISER TYPE</h2>
+                <h2 class="settings_h2 prevent_select">VISUALISER</h2>
                 <h3 class="prevent_select" id="settings_h3_option1"></h3>
             </div>
 
@@ -48,6 +49,53 @@
                     <div class="settings_options_button_template" id="settings_option1_button4"></div>
                     <p class="prevent_select">Softmax Frequency Intensity (to be added)</p>
                 </div>
+            
+
+                <div id="settings_option1_hidden_sub">
+                    <div class="settings_option1_sub_settings" id="intensity_spectrum_settings">
+                        <h2>Line Colour</h2>
+                        <div id="line_colour">
+                                <input id="box_custom_colour" type="color">
+                                <h4 id="box_custom_colour_hex_code"></h4>
+                        </div>
+                        
+                        <h2>X Axis Scale</h2>
+                        <div class="settings_button_container_template" id="axis_scale">
+                            <div class="settings_button_template" id="axis_scale_linear">
+                                <p class="prevent_select">Linear</p>
+                            </div>
+                            <div class="settings_button_template" id="axis_scale_logarithmic">
+                                <p class="prevent_select">Logarithmic</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="settings_option1_sub_settings" id="spectrogram_settings">
+                        <h2>Heatmap Colour</h2>
+                        <div id="heatmap_colour">
+                            <img class="heatmap_colours" id="heatmap_blue-red-white" src="../icons/settings/blue-red-white.png" alt="blue-red-white">
+                            <img class="heatmap_colours" id="heatmap_purple-orange" src="../icons/settings/purple-orange.png" alt="purple-orange">
+                            <img class="heatmap_colours" id="heatmap_red-blue-green" src="../icons/settings/red-blue-green.png" alt="red-blue-green">
+                            <img class="heatmap_colours" id="heatmap_red-green" src="../icons/settings/red-green.png" alt="red-green">
+                            <img class="heatmap_colours" id="heatmap_black-white" src="../icons/settings/black-white.png" alt="black-white">
+                        </div>
+                        <h2>Spectrogram Refresh Rate</h2>
+                        <div class="settings_button_container_template" id="spectrogram_refresh">
+                            <div class="settings_button_template" id="spectrogram_refresh_10">
+                                <p class="prevent_select">1000ms</p>
+                            </div>
+                            <div class="settings_button_template" id="spectrogram_refresh_5">
+                                <p class="prevent_select">500ms</p>
+                            </div>
+                            <div class="settings_button_template" id="spectrogram_refresh_3">
+                                <p class="prevent_select">300ms</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings_option1_sub_settings" id="waveform_settings"></div>
+                    <div class="settings_option1_sub_settings" id="softmax_settings"></div>
+                </div>
+
             </div>
 
         </div>
@@ -114,7 +162,7 @@
 
     </main>
 
-    <p>Version 1.101</p>
+    <p>Version 1.30 - b</p> <!-- a = visual update, b = functional update, c = feature update -->
     
 </body>
 
