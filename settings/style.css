@@ -186,6 +186,6 @@ input {
 @media (max-width: 800px) {
     #heatmap_colour {
         display: grid;
-        grid-template-columns: max-content max-content max-content;
+        grid-template-columns: repeat(auto-fill, 150px);
     }
 }
