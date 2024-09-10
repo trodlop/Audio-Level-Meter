@@ -1,4 +1,6 @@
 const decibels_display = document.getElementById("decibels");
+const max_display = document.getElementById("max_display");
+const avg_display = document.getElementById("avg_display");
 const calibration_display = document.getElementById("calibration");
 
 const visualiser_container = document.getElementById("visualiser_container");
@@ -13,6 +15,9 @@ let capture_interval_id = null; // To store the interval ID
 
 const display_type = localStorage.getItem("display_type"); // "mean" = mean average intensity, "trimmed mean" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
+let maximum = 0; // Maximum value of recorded sound levels
+let maximum_sum = 0; // Keeps sum of recorded audio level values (numerator for maximum average)
+let maximum_counter = 0; // Counts number of recorded audio level values (divisor for maximum average)
 let calibration = 0; // Default calibration
 const w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU R 468 Weighting, "z" = Z (zero) Weighting
 
@@ -349,7 +354,7 @@ function update_spectrogram() {
 const audioContext = new (window.AudioContext || window.AudioContext)();
 const analyser = audioContext.createAnalyser();
 
-analyser.fftSize = 1024;
+analyser.fftSize = 1024; // Array length = fftSize / 2, ie. 512
 analyser.smoothingTimeConstant = 0.25; 
 // smoothingTimeConstant => 0 = less smoothing (decreased latency)   
 // smoothingTimeConstant => 1 = more smoothing (increased latency)
@@ -386,33 +391,37 @@ function captureAudioData() {
     // Adjust the data
     Decibels = frequencyData.map(value => value + 120 + calibration); // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
 
-    apply_weighting();
+    apply_weighting(); // Applies any weighting selected
 
-    calc_average();
+    calc_average(); // Calculates average current sound level (to be used for VU meter)
 
-    update_meter_display()
-    update_decibels_display();
-    update_visualiser();
+    update_meter_display() // Updates VU meter showing average current sound level
+    update_decibels_display(); // Updates all decibel meter displays (max, avg and current)
+    update_visualiser(); // Updates the visualiser
 };
 
 function calc_average() {
 
     let sum = 0;
+    let valid_count = 0;
 
+    // console.log(Decibels);
+    
     for (let i = 0; i < Decibels.length; i++) {
 
         if (Decibels[i] > 0) { // Checks for values less than 0dB and ignores 
             let value = Math.pow(10, Decibels[i] / 10); // Converts decibels to linear scale
             sum += value; // Sums all values in array
+            valid_count += 1;
         };
 
     };
 
-    average = sum / Decibels.length; // Calculates mean average of array
+    average = sum / valid_count; // Calculates mean average of array
 
     average = Math.log10(average) * 10; // Converts back into decibel scale
 
-    if (average == -Infinity) { // Checks for average -Infinity and =0
+    if (isNaN(average)) { // Checks for edge case where tries to divide 0 by 0 and returns NaN (happens when all Decibel values are negative)
         average = 0
     };
 
@@ -548,12 +557,13 @@ function update_meter_display() {
 
 // Updates the display showing sound level
 function update_decibels_display() {
+    let num;
 
     if (display_type == "max") {
-        let num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
+        num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
         num = parseFloat(num); // Makes sure to return a number
         num = num.toFixed(1); // Returns float to 1 decimal place
-        decibels_display.innerText = `${num} dB`;
+        decibels_display.innerText = num;
     }
     else if (display_type == "trimmed mean") { // Calculates the average sound level within a certain range (eliminating any outlying intensities, ie. anything +- 2 standard deviations from normal mean)
         // trimmed mean to be added
@@ -561,11 +571,23 @@ function update_decibels_display() {
         // TODO     calculate standard deviation
         // TODO     remove all values above or below 2 sd
         // TODO     calculate new mean
-        decibels_display.innerText = `${average} dB`;
+        decibels_display.innerText = average;
     }
     else {
-        decibels_display.innerText = `${average} dB`;
+        decibels_display.innerText = average;
     };
+
+    if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
+        maximum = decibels_display.innerText
+        max_display.innerText = maximum        
+    };
+
+    maximum_sum += parseFloat(decibels_display.innerText);
+    maximum_counter += 1;
+    num = maximum_sum / maximum_counter;
+    num = parseFloat(num);
+    num = num.toFixed(1);
+    avg_display.innerText = num;
 };
 
 const calibrationSlider = document.getElementById('calibration_slider');
@@ -586,10 +608,13 @@ calibrationSlider.addEventListener('input', function() {
 
 
 //TODO          Add settings for:
-//TODO                              changing refresh rate of audio capture (100ms, 200ms, 500ms)
+//TODO                              changing refresh rate of decibels display 
+//TODO                              softmax line colour
+//TODO                              softmax settings
 
 //TODO          Link main page to portfolio website
 //TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
+//TODO          Add softmax and waveform visualisation
 
 
 
