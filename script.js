@@ -6,8 +6,44 @@ const calibration_display = document.getElementById("calibration");
 const visualiser_container = document.getElementById("visualiser_container");
 const spectrogram_axis = document.getElementById("spectrogram_x_axis");
 
+// Initialises all of the settings information in local storage:
+function initialise_settings() {
+    if (localStorage.getItem("display_type") === null) {
+        localStorage.setItem("display_type","max"); // max, mean
+    };
+    if (localStorage.getItem("weighting") === null) {
+        localStorage.setItem("weighting","a"); // itu r, a, c, z
+    };
+    if (localStorage.getItem("visualiser_type") === null) {
+        localStorage.setItem("visualiser_type","intensity spectrum"); // intensity spectrum, spectrogram, waveform, softmax
+    };
+    if (localStorage.getItem("time_interval") === null) {
+        localStorage.setItem("time_interval",100); // 500, 200, 100
+    };
+    if (localStorage.getItem("intensity_spectrum_colour") === null) {
+        localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan
+    };
+    if (localStorage.getItem("intensity_spectrum_axis") === null) {
+        localStorage.setItem("intensity_spectrum_axis","logarithmic"); // logarithmic, linear
+    };
+    if (localStorage.getItem("spectrogram_colour") === null) {
+        localStorage.setItem("spectrogram_colour","blue-red-white"); // blue-red-white, purple-orange, red-blue-green, red-green, black-white
+    };
+    if (localStorage.getItem("spectrogram_refresh") === null) {
+        localStorage.setItem("spectrogram_refresh",5); // 3, 5, 10
+    };
+    if (localStorage.getItem("waveform_colour") === null) {
+        localStorage.setItem("waveform_colour","#008EFF"); // "#008EFF" = cyan
+    };
+    if (localStorage.getItem("data_smoothing") === null) {
+        localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay
+    };
+    console.log("Settings initialised");
+};
+initialise_settings();
+
 let array; // Array for temporary use case
-let frequencyData; // Array storing frequency data directly from AudioAPI
+let Data; // Array storing frequency data directly from AudioAPI
 let Decibels = []; // Array for storing frequency intensity (calculated from frequencyData array)
 let normalized_data_array = []; // Array for storing normalised frequency intensity
 let mediaStream = null; // Object to handle incoming audio data from microphone
@@ -20,6 +56,7 @@ let maximum_sum = 0; // Keeps sum of recorded audio level values (numerator for 
 let maximum_counter = 0; // Counts number of recorded audio level values (divisor for maximum average)
 let calibration = 0; // Default calibration
 const w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU R 468 Weighting, "z" = Z (zero) Weighting
+const smoothing = localStorage.getItem("data_smoothing"); // "raw" = no smoothing, "savitzky-golay" = savitzky-golay filter
 
 const refresh_interval = localStorage.getItem("time_interval");
 const spectrogram_refresh = localStorage.getItem("spectrogram_refresh");
@@ -31,40 +68,10 @@ document.getElementById('refresh').addEventListener('click', function() {
 
 const connect = document.getElementById("connect");
 const play = document.getElementById("play");
-const play_pause = document.getElementById("play_pause")
+const play_pause = document.getElementById("play_pause");
 
 const calibrate_up = document.getElementById("calibrate_up");
 const calibrate_down = document.getElementById("calibrate_down");
-
-// Initialises all of the settings information in local storage:
-function initialise_settings() {
-    if (localStorage.getItem("display_type") === null) {
-        localStorage.setItem("display_type","max"); // max, mean, trimmed mean
-    };
-    if (localStorage.getItem("weighting") === null) {
-        localStorage.setItem("weighting","a"); // itu r, a, c, z
-    };
-    if (localStorage.getItem("visualiser_type") === null) {
-        localStorage.setItem("visualiser_type","intensity spectrum"); // intensity spectrum, spectrogram, waveform, softmax
-    };
-    if (localStorage.getItem("time_interval") === null) {
-        localStorage.setItem("time_interval",100); // 500, 200, 100
-    };
-    if (localStorage.getItem("intensity_spectrum_colour") === null) {
-        localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan, #c70000 = red
-    };
-    if (localStorage.getItem("intensity_spectrum_axis") === null) {
-        localStorage.setItem("intensity_spectrum_axis","logarithmic"); // logarithmic, linear
-    };
-    if (localStorage.getItem("spectrogram_colour") === null) {
-        localStorage.setItem("spectrogram_colour","blue-red-white"); // blue-red-white, black-white
-    };
-    if (localStorage.getItem("spectrogram_refresh") === null) {
-        localStorage.setItem("spectrogram_refresh",5); // 3, 5, 10
-    };
-    console.log("Settings initialised");
-};
-initialise_settings();
 
 // Array to store all different frequency intervals (bins) (in Hz)
 const frequency_bins = [
@@ -80,17 +87,13 @@ const ITUR_weight = [
     -27.220560908538065, -21.200833325925604, -17.680461132946792, -15.183718704459292, -13.248128189899507, -11.66768805620092, -10.332509172029226, -9.176995829274919, -8.158835729477506, -7.249136591069174, -6.427288974742375, -5.6780738802588075, -4.9899320834906895, -4.353876679716485, -3.7627817189939883, -3.1984935817369546, -2.6818786378666566, -2.1957970729179976, -1.7369963320439084, -1.3027225443515569, -0.8906231793869352, -0.49867235057532966, -0.12511272466112544, 0.23159020359830862, 0.5727845001734693, 0.8996610410026307, 1.2132772383249595, 1.514576449149633, 1.8044039749052736, 2.0835203456032794, 2.358756217382151, 2.618234825567866, 2.8688903157900505, 3.1112379810647486, 3.345749258446176, 3.5728566399569353, 3.7929579085263256, 4.006419806940759, 4.213581228191192, 4.414755999953833, 4.610235323380145, 4.800289916231343, 4.985171902158745, 5.165116481210738, 5.340343411133178, 5.514976323569046, 5.681273647423076, 5.843436486538563, 6.00163441483674, 6.156026907454752, 6.306764098549019, 6.4539874647368105, 6.597830442742028, 6.738418988691427, 6.875872085551826, 7.01030220438113, 7.141815724363756, 7.270513315996794, 7.396490291271508, 7.519836924243464, 7.643418469557689, 7.761700167608753, 7.877596678487741, 7.991180745821776, 8.10252133271583, 8.211683816825762, 8.318730171046635, 8.423719131163072, 8.526706351672976, 8.627744550876265, 8.726883646214036, 8.824170880749763, 8.919650941600347, 9.013366071050577, 9.105356171018006, 9.197739177167918, 9.286352039582953, 9.373347247428345, 9.458756227974995, 9.54260851203215, 9.624931809515692, 9.705752081683244, 9.785093610365404, 9.86297906449605, 9.93942956422055, 10.014464742838534, 10.088102806817256, 10.160360594092545, 10.231253630856383, 10.300796187013464, 10.370571681464678, 10.437420638908417, 10.502955164791702, 10.56718501364181, 10.630118947505293, 10.691764786394872, 10.752129458275306, 10.811219048659757, 10.869038849875789, 10.92559341004855, 10.980886581836655, 11.03492157094499, 11.087700984427084, 11.139226878778663, 11.189500807812907, 11.239649064591639, 11.287392883004792, 11.333886860196298, 11.379131005963043, 11.423125063524491, 11.465868555295767, 11.507360828090754, 11.547601097669315, 11.586588492535332, 11.624322096885864, 11.660800992605601, 11.696024300195942, 11.729991218523772, 11.76270106327171, 11.794153303969484, 11.825034823542365, 11.853941799209519, 11.881590855445305, 11.907982421824162, 11.933117242024078, 11.956996399767151, 11.979621342519723, 12.000993902851361, 12.021116317359365, 12.039991243073327, 12.057621771263456, 12.074011438585945, 12.089164235509298, 12.103084611976413, 12.115777480269005, 12.127500480908743, 12.137726703496144, 12.146743066677006, 12.154556314522443, 12.161173625184164, 12.166602596890897, 12.170851231257945, 12.173927913974644, 12.175841392945426, 12.176600753971151, 12.176215394067352, 12.174694992525321, 12.172049479830825, 12.168289004563029, 12.16342389840316, 12.157313118167547, 12.150245219688657, 12.14210465685362, 12.132902111027455, 12.122648247298654, 12.111353671139193, 12.099028884214611, 12.08568423950172, 12.071329895871745, 12.055975772296659, 12.039631501835954, 12.022306385560222, 12.004009346566804, 11.984748884241535, 11.964533028919211, 11.942865896126332, 11.920739442603809, 11.897678568885507, 11.873688973488228, 11.848775669467093, 11.822942944633098, 11.79619432320871, 11.768532529067443, 11.739959450703672, 11.710476108079783, 11.680082621498663, 11.648778182651021, 11.616561027988382, 11.583428414574431, 11.54937659856947, 11.513576388088744, 11.477649141258384, 11.440785110747907, 11.402976367439221, 11.364213918661427, 11.324487705895073, 11.283786606233285, 11.242098437759058, 11.199409968995084, 11.155706932578383, 11.110974043305717, 11.065195020688535, 11.018352616145966, 10.970428644953047, 10.921404023046712, 10.870079142833694, 10.818765787697641, 10.766289067374766, 10.712626752640753, 10.65775597560693, 10.601653296821258, 10.544294777322996, 10.485656055542137, 10.425712428896029, 10.364438939894875, 10.301810466525133, 10.237801816635622, 10.172387826005949, 10.105543459730956, 10.037243916509315, 9.965824164822086, 9.894506083809521, 9.821660362241648, 9.747264234206112, 9.671295717504313, 9.593733724309528, 9.514558170697049, 9.433750084354344, 9.351291709766038, 9.267166610162853, 9.181359765525496, 9.093857665944167, 9.004648399652618, 8.913721735081769, 8.821069196312846, 8.72446847367028, 8.628305671566185, 8.530402702752074, 8.430758763840938, 8.329375067756455, 8.226254869241707, 8.121403481006299, 8.014828280411962, 7.906538706679756, 7.796546248683937, 7.684864423479393, 7.57150874578873, 7.456496688750729, 7.339847636303512, 7.221582827641349, 7.098919154341589, 6.97745749358549, 6.854454895140295, 6.729939359138546, 6.6039403614147805, 6.476488762348243, 6.34761671211152, 6.217357553022394, 6.085745719692312, 5.952816637653001, 5.818606621124923, 5.683152770566075, 5.546492870610548, 5.40866528897082, 5.269708876839829, 5.126393339831292, 4.985273320592956, 4.843143887408026, 4.700044877268173, 4.5560161489224935, 4.411097501156782, 4.265328595075857, 4.118748880562354, 3.971397527042466, 3.823313358649653, 3.674534793839136, 3.525099789471261, 3.3750457893493166, 3.2244096771686674, 3.0732277338071334, 2.921535598863821, 2.7658240823669082, 2.6132058969949803, 2.460181038543581, 2.306782259733957, 2.1530415384996004, 1.998990062192476, 1.844658214963907, 1.690075568137054, 1.5352708733862777, 1.3802720585387895, 1.2251062258153524, 1.0697996523298698, 0.9143777926710719, 0.7588652833944316, 0.6032859492578275, 0.44404332699308213, 0.28839836706656996, 0.13275376036476416, -0.022869841609828967, -0.17845254689357049, -0.33397520947527326, -0.48941941494538455, -0.6447674654908546, -0.8000023643384928, -0.9551077997424393, -1.1100681286043859, -1.2648683598084887, -1.4194941373463799, -1.5739317233013708, -1.7281679807551562, -1.8857696302884328, -2.0395607475337947, -2.1931143010293397, -2.3464193994613325, -2.4994656673282236, -2.6522432284162782, -2.804742689498159, -2.95695512428016, -3.1088720576207116, -3.260485450039269, -3.4117876825323386, -3.562771541710106, -3.713430205265208, -3.8637572277827914, -4.0137465268987675, -4.166868375193513, -4.316157191096909, -4.465091967497713, -4.613667950026663, -4.761880683233226, -4.90972599889874, -5.057200004704622, -5.204299073252155, -5.351019831429554, -5.497359150121646, -5.643314134256531, -5.788882113183433, -5.934060631375395, -6.078847439450119, -6.223240485502107, -6.370581962864197, -6.514172819246085, -6.6573648275060044, -6.800156648703709, -6.942547102282688, -7.084535159119966, -7.2261199348342195, -7.3673006833446735, -7.508076790673162, -7.648447768981729, -7.788413250838463, -7.927972983704169, -8.067126824632599, -8.2058747351773, -8.344216776497962, -8.485356100744088, -8.622877536375153, -8.759993846536542, -8.896705447488909, -9.033012833300553, -9.168916572017295, -9.304417301987414, -9.439515728335977, -9.574212619583026, -9.708508804400289, -9.842405168501166, -9.975902651659133, -10.109002244849425, -10.241704987509607, -10.374011964914214, -10.50898734830643, -10.640497085729795, -10.771614592648362, -10.902341114385077, -11.032677930489118, -11.1626263527105, -11.292187723061023, -11.421363411958119, -11.550154816448359, -11.678563358507422, -11.806590483413437, -11.9342376581908, -12.061506370121652, -12.188398125322244, -12.314914447381586, -12.443985984656209, -12.569747434211997, -12.695138150128251, -12.820159713711348, -12.944813717758688, -13.069101765522571, -13.193025469720634, -13.316586451591018, -13.43978633999016, -13.562626770531807, -13.685109384765276, -13.80723582939147, -13.929007755515148, -14.05042681793174, -14.171494674447533, -14.295016242133169, -14.41537859856344, -14.53539477293393, -14.655066428921241, -14.774395230253926, -14.893382840205664, -15.012030921113162, -15.130341133917643, -15.248315137729012, -15.365954589411754, -15.483261143191609, -15.600236450282157, -15.716882158530527, -15.833199912081358, -15.9491913510583, -16.067544185883893, -16.18288040514275, -16.297895240896043, -16.41259031420098, -16.526967240733573, -16.641027630561037, -16.75477308792704, -16.868205211049318, -16.98132559192921, -17.094135816172358, -17.20663746282042, -17.31883210419306, -17.430721305739876, -17.542306625901848, -17.653589615981833, -17.767149235009125, -17.87782524862215, -17.98820357753939, -18.09828574320748, -18.208073259408526, -18.317567632177575, -18.42677035972665, -18.535682932375163, -18.644306832486404, -18.752643534409746, -18.860694504428434, -18.96846120071262, -19.075945073277456, -19.183147563945976, -19.290070106316566, -19.399190916640965, -19.505551402647132, -19.61163622420528, -19.71744678158115, -19.822984466714782, -19.928250663211404, -20.033246746335795, -20.137974083009556, -20.24243403181153, -20.346627942980927, -20.450557158423255, -20.55422301171873, -20.657626828133157, -20.76076992463111, -20.863653609891347, -20.96866276488905, -21.07102556343747, -21.173132857015137, -21.274985921160965, -21.37658602323477, -21.477934422443706, -21.57903236987021, -21.67988110850128, -21.780481873259287, -21.880835891033815, -21.980944380714906, -22.080808553227318, -22.180429611565852, -22.279808750831688, -22.378947158269686, -22.48014314582453, -22.578798090247613, -22.67721584480078, -22.77539756551437, -22.873344400761756, -22.9710574913011, -23.06853797031764, -23.165786963466562, -23.262805588916326, -23.359594957392456, -23.456156172221693, -23.55249032937665, -23.648598517520643, -23.74448181805293, -23.840141305154244, -23.937794863127923, -24.033004774317103, -24.12799407616451, -24.222763814273083, -24.317315027258967, -24.411648746797997, -24.505765997672444, -24.59966779781772, -24.693355158369148, -24.786829083708863, -24.880090571512564, -24.97314061279638, -25.06598019196368, -25.158610286851815, -25.251031868778913, -25.345387953233352, -25.4373906042894, -25.52918763975398, -25.620780005186926, -25.712168639862167, -25.803354476813812, -25.894338442882162, -25.985121458759483, -26.075704439035693, -26.166088292243817, -26.256273920905304, -26.346262221575206, -26.436054084886965, -26.525650395597292, -26.61505203263059, -26.706332171041975
 ];
 
-let visualiser_type = localStorage.getItem("visualiser_type")
+const visualiser_type = localStorage.getItem("visualiser_type");
 const canvas = document.getElementById("visualiser"); // Accesses canvas element in html
 var ctx = canvas.getContext('2d'); // Creates a context to be able to draw on the canvas
 
 if (visualiser_type == "intensity spectrum") {
-    // Code block for drawing frequency intensity spectrum (Note X axis is logarithmic (no linear axis option for now) + (more graph options (softmax, spectrogram, wavefront)))
-    // var ctx = document.getElementById("visualiser").getContext("2d"); 
+    // Code block for drawing frequency intensity spectrum
     Chart.defaults.animation = false; // Makes sure that graph refreshes instantly
-
-    // const canvas = document.getElementById("visualiser");
-
     var visualiser = new Chart(ctx, {
         type: 'line',  // Sets graph to line graph
         data: {
@@ -273,7 +276,74 @@ else if (visualiser_type == "spectrogram") {
     spectrogram_resize();
 }
 else if (visualiser_type == "waveform") {
-    console.log("waveform not available yet");
+    // Code block for drawing waveform
+    Chart.defaults.animation = false; // Makes sure that graph refreshes instantly
+    var visualiser = new Chart(ctx, {
+        type: 'line',  // Sets graph to line graph
+        data: {
+            labels: [
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512
+            ], // List of frequency bins
+            datasets: [{
+                label: 'Data Points',
+                data: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ], // Decibel values for each frequency bin
+                backgroundColor: 'rgba(255, 255, 255, 0)',
+                borderColor: localStorage.getItem("waveform_colour"),
+                borderWidth: 1.5, // Make the line thicker
+                pointRadius: 0, // Remove the circle markers
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: false, // Allow the aspect ratio to be overridden
+            plugins: {
+                tooltip: {
+                    enabled: false // Disable tooltips
+                },
+                legend: {
+                    display: false,
+                },
+            },
+            scales: {
+                x: {
+                    type: "linear",
+                    position: 'bottom',
+                    ticks: {},
+                    afterBuildTicks: function(axis) {
+                        // Clear all pregenerated ticks
+                        axis.ticks = [];                        
+                    },
+
+                    min: 1, // Set the minimum value for the x-axis
+                    max: 512, // Set the maximum value for the x-axis
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.3)',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        lineWidth: 1
+                    },
+                    title: {
+                        display: false,
+                    }
+                },
+                y: {
+                    min: -1,    // Minimum value of the Y-axis
+                    max: 1,    // Maximum value of the Y-axis
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.5)', // Adjust the color and opacity
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        lineWidth: 0
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
+        }
+    });
 }
 else if (visualiser_type == "softmax") {
     console.log("softmax not available yet");
@@ -289,8 +359,7 @@ function spectrogram_resize() {
 
     spectrogram_axis.style.width = `${width * 0.95}px`;
 };
-
-window.addEventListener("resize",spectrogram_resize)
+window.addEventListener("resize",spectrogram_resize);
 
 function update_spectrogram() {
 
@@ -364,34 +433,41 @@ async function connect_microphone() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaStream = stream; // Assign the stream to mediaStream
 
-
         // Connect the stream to the audio context
         const source = audioContext.createMediaStreamSource(stream);
         source.connect(analyser);
 
         // Create a Float32Array to hold the frequency data
         const bufferLength = analyser.frequencyBinCount;
-        frequencyData = new Float32Array(bufferLength);
+        Data = new Float32Array(bufferLength);
 
         console.log("Successfully connected to microphone");
 
         if (audioContext.state === 'suspended') {
             audioContext.resume();
         };
-    } catch (err) {
+    }
+    catch (err) {
         console.error("Error accessing the microphone: ", err);
         throw err; // Rethrow the error so it can be caught later
-    }
+    };
 };
 
 function captureAudioData() {
     // Get the frequency data from the analyser
-    analyser.getFloatFrequencyData(frequencyData);
-
-    // Adjust the data
-    Decibels = frequencyData.map(value => value + 120 + calibration); // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
+    if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
+        analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
+        // Adjust the data and save in Decibels Array
+        Decibels = Data.map(value => value + 120 + calibration); // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
+    }
+    else if (visualiser_type == "waveform") {
+        analyser.getFloatTimeDomainData(Data); // Gets array of amplitude values over given time interval (~ 0.0023ms)
+        // Save data in Decibels array
+        Decibels = Data.map(value => value);
+    };
 
     apply_weighting(); // Applies any weighting selected
+    apply_smoothing(); // Applies any smoothing function selected
 
     calc_average(); // Calculates average current sound level (to be used for VU meter)
 
@@ -441,7 +517,7 @@ function Play() {
         connect_microphone().then(() => {
             // After successfully connecting, start the interval
             if (!capture_interval_id) { // Only set a new interval if one is not already running
-                capture_interval_id = setInterval(captureAudioData, refresh_interval);
+                capture_interval_id = setInterval(captureAudioData, refresh_interval); // refresh_interval
             }
         }).catch(err => {
             console.error("Failed to connect to the microphone.");
@@ -482,21 +558,108 @@ play.addEventListener("click", toggle_play);
 // Applies weighting to each frequency interval (A, Z, ITU-R-468)
 function apply_weighting() {
 
-    if (w == "itu r") {
-        array = Decibels
-        Decibels = array.map((value, index) => value + ITUR_weight[index])
-        array = []
-    }
-    else if (w == "a") {
-        array = Decibels
-        Decibels = array.map((value, index) => value + A_weight[index])
-        array = []
-    }
-    else if (w == "c") {
-        // C weighting to be added
-    } 
-    // else if { apply 'zero' weighting }
-        
+    if (visualiser_type != "waveform") {
+        if (w == "itu r") {
+            array = Decibels
+            Decibels = array.map((value, index) => value + ITUR_weight[index])
+            array = []
+        }
+        else if (w == "a") {
+            array = Decibels
+            Decibels = array.map((value, index) => value + A_weight[index])
+            array = []
+        }
+        else if (w == "c") {
+            // C weighting to be added
+        } 
+        // else if { apply 'zero' weighting }
+    };     
+};
+
+// Applies smoothing function to the Decibels array (raw, savitzky-golay)
+function apply_smoothing() {
+
+    if (visualiser_type != "waveform") {
+        if (smoothing == "savitzky-golay") {
+            Decibels = savitzky_golay(Decibels);
+        }
+        else {
+            // Apply no smoothing
+        };
+    };
+};
+
+// Calculates the savitzky-golay smoothing filter for the Decibels array
+function savitzky_golay(Data) {
+    const window_size = 9;
+    const half_window = Math.floor(window_size / 2);
+    const order = 2;
+    let matrix = [];
+    let smoothed_data = [];
+
+    // Calculates filter coefficients using least squares fitting
+
+    // Create the Vandermonde matrix (basis polynomials)
+    for (let i = -half_window; i <= half_window; i++) {
+        let row = [];
+
+        for (let j = 0; j <= order; j++) {
+            row.push(Math.pow(i, j));
+        };
+
+        matrix.push(row);
+    };
+
+    console.log(`half = ${half_window}`);
+    
+    // Calculate pseudo-inverse of the matrix
+    //! A+ = (A^T A)^-1 A^T
+    let pseudo_inverse_matrix = numeric.dot(numeric.transpose(matrix), matrix);
+    // console.log("matrix =");
+    // console.log(matrix);
+    // console.log("pseudo-inv =");
+    // console.log(pseudo_inverse_matrix);
+
+    pseudo_inverse_matrix = numeric.inv(pseudo_inverse_matrix);
+    // console.log("pseudo-inv =");
+    // console.log(pseudo_inverse_matrix);
+
+    pseudo_inverse_matrix = numeric.dot(pseudo_inverse_matrix, numeric.transpose(matrix));
+    // console.log("pseudo-inv =");
+    // console.log(pseudo_inverse_matrix);
+    
+    const coefficients = pseudo_inverse_matrix[0];
+    // console.log(`coefficients = ${coefficients}`);
+
+    // Applies smoothing to Decibels array
+    
+    for (let i = 0; i < Data.length; i++) {
+        let result = 0;
+    
+        // Convolve the window with the coefficients
+        for (let j = -half_window; j <= half_window; j++) {
+            let dataIndex = i + j;
+            // console.log(`i = ${i}`);
+            // console.log(`j = ${j}`);
+            // console.log(`dataIndex = ${dataIndex}`);
+
+            if (dataIndex < 0 || dataIndex >= Data.length) {
+
+                // Handle out-of-bounds indices (e.g., extend the edge values)
+                dataIndex = Math.max(0, Math.min(Data.length - 1, dataIndex));
+            };
+            // console.log(`coefficients = ${coefficients}`);
+            // console.log(`Data = ${Data}`);
+
+            result += Data[dataIndex] * coefficients[j + half_window];
+            // console.log(`result = ${result}`);  
+        };
+        smoothed_data.push(result);
+    };
+    // console.log(Decibels);
+    // console.log(smoothed_data);
+
+    return smoothed_data;
 };
 
 let counter = 0 // Counter for visualiser timing
@@ -520,7 +683,8 @@ function update_visualiser() {
         };
     }
     else if (visualiser_type == "waveform") {
-        // to be added
+        visualiser.data.datasets[0].data = Decibels
+        visualiser.update(); // Redraw the chart with updated data
     }
     else if (visualiser_type == "softmax") {
         // to be added
@@ -555,39 +719,34 @@ function update_meter_display() {
     };
 }; 
 
-// Updates the display showing sound level
+// Updates the display showing sound level, maximum and average maximum
 function update_decibels_display() {
     let num;
 
-    if (display_type == "max") {
-        num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
-        num = parseFloat(num); // Makes sure to return a number
-        num = num.toFixed(1); // Returns float to 1 decimal place
-        decibels_display.innerText = num;
-    }
-    else if (display_type == "trimmed mean") { // Calculates the average sound level within a certain range (eliminating any outlying intensities, ie. anything +- 2 standard deviations from normal mean)
-        // trimmed mean to be added
-        // currently returns normal mean
-        // TODO     calculate standard deviation
-        // TODO     remove all values above or below 2 sd
-        // TODO     calculate new mean
-        decibels_display.innerText = average;
-    }
-    else {
-        decibels_display.innerText = average;
-    };
+    if (visualiser_type != "waveform") {
 
-    if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
-        maximum = decibels_display.innerText
-        max_display.innerText = maximum        
+        if (display_type == "max") {
+            num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
+            num = parseFloat(num); // Makes sure to return a number
+            num = num.toFixed(1); // Returns float to 1 decimal place
+            decibels_display.innerText = num;
+        }
+        else {
+            decibels_display.innerText = average;
+        };
+    
+        if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
+            maximum = decibels_display.innerText
+            max_display.innerText = maximum        
+        };
+    
+        maximum_sum += parseFloat(decibels_display.innerText);
+        maximum_counter += 1;
+        num = maximum_sum / maximum_counter;
+        num = parseFloat(num);
+        num = num.toFixed(1);
+        avg_display.innerText = num;
     };
-
-    maximum_sum += parseFloat(decibels_display.innerText);
-    maximum_counter += 1;
-    num = maximum_sum / maximum_counter;
-    num = parseFloat(num);
-    num = num.toFixed(1);
-    avg_display.innerText = num;
 };
 
 const calibrationSlider = document.getElementById('calibration_slider');
@@ -609,14 +768,18 @@ calibrationSlider.addEventListener('input', function() {
 
 //TODO          Add settings for:
 //TODO                              changing refresh rate of decibels display 
+//                                  spectrogram colours
+//                                  spectrogram refresh rate
+//                                  waveform line colour
 //TODO                              softmax line colour
 //TODO                              softmax settings
+//?                                 intensity spectrum data visualisation type (raw or smoothed) (add more smoothing options)
+
+//?             Add smoothing function to Decibels array (add more smoothing options)
+//TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
+//              Add Spectrogram visualisation
+//              Add Waveform visualisation
+//TODO          Add softmax visualisation
+//TODO          Add correct decibel and VU meter display for when waveform is selected
 
 //TODO          Link main page to portfolio website
-//TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
-//TODO          Add softmax and waveform visualisation
-
-
-
-
-//?             Maybe change meter reading to be maximum instead of mean?
