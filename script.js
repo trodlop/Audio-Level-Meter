@@ -35,6 +35,12 @@ function initialise_settings() {
     if (localStorage.getItem("waveform_colour") === null) {
         localStorage.setItem("waveform_colour","#008EFF"); // "#008EFF" = cyan
     };
+    if (localStorage.getItem("softmax_axis") === null) {
+        localStorage.setItem("softmax_axis","linear"); // logarithmic, linear
+    };
+    if (localStorage.getItem("softmax_colour") === null) {
+        localStorage.setItem("softmax_colour","#008EFF"); // "#008EFF" = cyan
+    };
     if (localStorage.getItem("data_smoothing") === null) {
         localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay
     };
@@ -346,7 +352,152 @@ else if (visualiser_type == "waveform") {
     });
 }
 else if (visualiser_type == "softmax") {
-    console.log("softmax not available yet");
+    // Code block for drawing frequency intensity spectrum
+    Chart.defaults.animation = false; // Makes sure that graph refreshes instantly
+    var visualiser = new Chart(ctx, {
+        type: 'bar',  // Sets graph to bar graph
+        data: {
+            labels: [
+                43, 86, 129, 172, 215, 258, 301, 344, 387, 430, 473, 516, 559, 602, 645, 689, 732, 775, 818, 861, 904, 947, 990, 1033, 1076, 1119, 1162, 1205, 1248, 1291, 1335, 1378, 1421, 1464, 1507, 1550, 1593, 1636, 1679, 1722, 1765, 1808, 1851, 1894, 1937, 1981, 2024, 2067, 2110, 2153, 2196, 2239, 2282, 2325, 2368, 2411, 2454, 2497, 2540, 2583, 2627, 2670, 2713, 2756, 2799, 2842, 2885, 2928, 2971, 3014, 3057, 3100, 3143, 3186, 3229, 3273, 3316, 3359, 3402, 3445, 3488, 3531, 3574, 3617, 3660, 3703, 3746, 3789, 3832, 3875, 3919, 3962, 4005, 4048, 4091, 4134, 4177, 4220, 4263, 4306, 4349, 4392, 4435, 4478, 4521, 4565, 4608, 4651, 4694, 4737, 4780, 4823, 4866, 4909, 4952, 4995, 5038, 5081, 5124, 5167, 5211, 5254, 5297, 5340, 5383, 5426, 5469, 5512, 5555, 5598, 5641, 5684, 5727, 5770, 5813, 5857, 5900, 5943, 5986, 6029, 6072, 6115, 6158, 6201, 6244, 6287, 6330, 6373, 6416, 6459, 6503, 6546, 6589, 6632, 6675, 6718, 6761, 6804, 6847, 6890, 6933, 6976, 7019, 7062, 7105, 7149, 7192, 7235, 7278, 7321, 7364, 7407, 7450, 7493, 7536, 7579, 7622, 7665, 7708, 7751, 7795, 7838, 7881, 7924, 7967, 8010, 8053, 8096, 8139, 8182, 8225, 8268, 8311, 8354, 8397, 8441, 8484, 8527, 8570, 8613, 8656, 8699, 8742, 8785, 8828, 8871, 8914, 8957, 9000, 9043, 9087, 9130, 9173, 9216, 9259, 9302, 9345, 9388, 9431, 9474, 9517, 9560, 9603, 9646, 9689, 9733, 9776, 9819, 9862, 9905, 9948, 9991, 10034, 10077, 10120, 10163, 10206, 10249, 10292, 10335, 10379, 10422, 10465, 10508, 10551, 10594, 10637, 10680, 10723, 10766, 10809, 10852, 10895, 10938, 10981, 11025, 11068, 11111, 11154, 11197, 11240, 11283, 11326, 11369, 11412, 11455, 11498, 11541, 11584, 11627, 11670, 11714, 11757, 11800, 11843, 11886, 11929, 11972, 12015, 12058, 12101, 12144, 12187, 12230, 12273, 12316, 12360, 12403, 12446, 12489, 12532, 12575, 12618, 12661, 12704, 12747, 12790, 12833, 12876, 12919, 12962, 13006, 13049, 13092, 13135, 13178, 13221, 13264, 13307, 13350, 13393, 13436, 13479, 13522, 13565, 13608, 13652, 13695, 13738, 13781, 13824, 13867, 13910, 13953, 13996, 14039, 14082, 14125, 14168, 14211, 14254, 14298, 14341, 14384, 14427, 14470, 14513, 14556, 14599, 14642, 14685, 14728, 14771, 14814, 14857, 14900, 14944, 14987, 15030, 15073, 15116, 15159, 15202, 15245, 15288, 15331, 15374, 15417, 15460, 15503, 15546, 15590, 15633, 15676, 15719, 15762, 15805, 15848, 15891, 15934, 15977, 16020, 16063, 16106, 16149, 16192, 16236, 16279, 16322, 16365, 16408, 16451, 16494, 16537, 16580, 16623, 16666, 16709, 16752, 16795, 16838, 16882, 16925, 16968, 17011, 17054, 17097, 17140, 17183, 17226, 17269, 17312, 17355, 17398, 17441, 17484, 17528, 17571, 17614, 17657, 17700, 17743, 17786, 17829, 17872, 17915, 17958, 18001, 18044, 18087, 18130, 18174, 18217, 18260, 18303, 18346, 18389, 18432, 18475, 18518, 18561, 18604, 18647, 18690, 18733, 18776, 18820, 18863, 18906, 18949, 18992, 19035, 19078, 19121, 19164, 19207, 19250, 19293, 19336, 19379, 19422, 19466, 19509, 19552, 19595, 19638, 19681, 19724, 19767, 19810, 19853, 19896, 19939, 19982, 20025, 20068, 20112, 20155, 20198, 20241, 20284, 20327, 20370, 20413, 20456, 20499, 20542, 20585, 20628, 20671, 20714, 20758, 20801, 20844, 20887, 20930, 20973, 21016, 21059, 21102, 21145, 21188, 21231, 21274, 21317, 21360, 21404, 21447, 21490, 21533, 21576, 21619, 21662, 21705, 21748, 21791, 21834, 21877, 21920, 21963, 22006, 22050
+            ], // List of frequency bins
+            datasets: [{
+                label: 'Data Points',
+                data: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ], // Decibel values for each frequency bin
+                backgroundColor: 'rgba(255, 255, 255, 0)',
+                borderColor: localStorage.getItem("softmax_colour"),
+                borderWidth: 1.5, // Make the line thicker
+                pointRadius: 0, // Remove the circle markers
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: false, // Allow the aspect ratio to be overridden
+            plugins: {
+                tooltip: {
+                    enabled: false // Disable tooltips
+                },
+                legend: {
+                    display: false,
+                },
+            },
+            scales: {
+                x: {
+                    type: localStorage.getItem("softmax_axis"),
+                    position: 'bottom',
+                    ticks: {
+                        callback: function(value, index, values) { // Displays X axis labels from custom pushed ticks
+
+                            const customLabels = {
+                                100: '100',
+                                500: '500',
+                                1000: '1k',
+                                2000: '2k',
+                                4000: '4k',
+                                8000: '8k',
+                                16000: '16k'
+                            };
+
+                            return customLabels[value] || '';
+                        },
+                    },
+                    afterBuildTicks: function(axis) {
+
+                        // Clear all pregenerated ticks
+                        axis.ticks = [];
+
+                        // Manually push only wanted ticks (essentially the vertical grid lines):                        
+
+                        // Iterate over the array and add ticks
+                        if (localStorage.getItem("softmax_axis") == "logarithmic") {
+                            const tickValues = [
+                                { value: 100, major: true },
+                                { value: 200, major: false },
+                                { value: 300, major: false },
+                                { value: 400, major: false },
+                                { value: 500, major: true },
+                                { value: 600, major: false },
+                                { value: 700, major: false },
+                                { value: 800, major: false },
+                                { value: 900, major: false },
+                                { value: 1000, major: true },
+                                { value: 2000, major: true },
+                                { value: 3000, major: false },
+                                { value: 4000, major: true },
+                                { value: 5000, major: false },
+                                { value: 6000, major: false },
+                                { value: 7000, major: false },
+                                { value: 8000, major: true },
+                                { value: 9000, major: false },
+                                { value: 10000, major: false },
+                                { value: 16000, major: true },
+                                { value: 20000, major: false }
+                            ];
+                            for (let i = 0; i < tickValues.length; i++) {
+                                axis.ticks.push({
+                                    value: tickValues[i].value,
+                                    major: tickValues[i].major,
+                                });
+                            };
+                        }
+                        else if (localStorage.getItem("softmax_axis") == "linear") {
+                            const tickValues = [
+                                { value: 100, major: true },
+                                { value: 1000, major: true },
+                                { value: 2000, major: true },
+                                { value: 3000, major: false },
+                                { value: 4000, major: true },
+                                { value: 5000, major: false },
+                                { value: 6000, major: false },
+                                { value: 7000, major: false },
+                                { value: 8000, major: true },
+                                { value: 9000, major: false },
+                                { value: 10000, major: false },
+                                { value: 16000, major: true },
+                                { value: 20000, major: false }
+                            ];
+                            for (let i = 0; i < tickValues.length; i++) {
+                                axis.ticks.push({
+                                    value: tickValues[i].value,
+                                    major: tickValues[i].major,
+                                });
+                            };
+                        };
+                        
+                    },
+
+                    
+                    min: 100, // Set the minimum value for the x-axis
+                    max: 22050, // Set the maximum value for the x-axis
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.3)',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        lineWidth: 1
+                    },
+                    title: {
+                        display: false,
+                    },
+                    barPercentage: 1.0, // Set bar width to take full category width
+                    categoryPercentage: 1.0 // Remove spacing between categories
+                },
+                y: {
+                    min: 0,    // Minimum value of the Y-axis
+                    max: 1,    // Maximum value of the Y-axis
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.5)', // Adjust the color and opacity
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        lineWidth: 2
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
+        }
+    });
 };
 
 function spectrogram_resize() {
@@ -469,6 +620,11 @@ function captureAudioData() {
     apply_weighting(); // Applies any weighting selected
     apply_smoothing(); // Applies any smoothing function selected
 
+    if (visualiser_type == "softmax") { // Normalises Decibels to be between 0 and 1, then exponentiates
+        Decibels = normalize_data(Decibels);
+        // console.log(Decibels);
+    };
+
     calc_average(); // Calculates average current sound level (to be used for VU meter)
 
     update_meter_display() // Updates VU meter showing average current sound level
@@ -508,8 +664,27 @@ function calc_average() {
 
 // Stores normalised intensity data
 function normalize_data(Decibels) {
-    normalized_data_array = Decibels.map(value => 1 / (1 + (2.718 ** (-0.05 * (value - 40)))));
-    return(normalized_data_array);
+    if (visualiser_type == "spectrogram") {
+        normalized_data_array = Decibels.map(value => 1 / (1 + (2.718 ** (-0.05 * (value - 40))))); // Sigmoid function for spectrogram
+        return(normalized_data_array);
+    }
+    else if (visualiser_type == "softmax") {
+        for (let i = 0; i < Decibels.length; i++) { // Makes any value less than 0, equal to 0
+            if (Decibels[i] < 0) {
+                Decibels[i] = 0
+            };
+        };
+        let min = Math.min.apply(Math, Decibels);
+        let max = Math.max.apply(Math, Decibels);    
+        
+        normalized_data_array = Decibels.map(value => (value - min) / (max - min)); // Normalises the dataset to be between 0 and 1
+
+        for (let i = 0; i < Decibels.length; i++) { // For some reason I Decibels.map() doesn't work so we're using a for loop to exponentiate each value
+            normalized_data_array[i] = normalized_data_array[i] ** 8;
+        };
+       
+        return(normalized_data_array);
+    };
 };
 
 function Play() {
@@ -687,7 +862,8 @@ function update_visualiser() {
         visualiser.update(); // Redraw the chart with updated data
     }
     else if (visualiser_type == "softmax") {
-        // to be added
+        visualiser.data.datasets[0].data = Decibels
+        visualiser.update(); // Redraw the chart with updated data
     };
 };
 
@@ -723,7 +899,7 @@ function update_meter_display() {
 function update_decibels_display() {
     let num;
 
-    if (visualiser_type != "waveform") {
+    if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram") {
 
         if (display_type == "max") {
             num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
