@@ -1,7 +1,7 @@
-// Makes sure that local storage settings have been initialised
+// Initialises all of the settings information in local storage:
 function initialise_settings() {
     if (localStorage.getItem("display_type") === null) {
-        localStorage.setItem("display_type","max"); // max, mean, trimmed mean
+        localStorage.setItem("display_type","max"); // max, mean
     };
     if (localStorage.getItem("weighting") === null) {
         localStorage.setItem("weighting","a"); // itu r, a, c, z
@@ -13,16 +13,22 @@ function initialise_settings() {
         localStorage.setItem("time_interval",100); // 500, 200, 100
     };
     if (localStorage.getItem("intensity_spectrum_colour") === null) {
-        localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan, #c70000 = red
+        localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan
     };
     if (localStorage.getItem("intensity_spectrum_axis") === null) {
         localStorage.setItem("intensity_spectrum_axis","logarithmic"); // logarithmic, linear
     };
     if (localStorage.getItem("spectrogram_colour") === null) {
-        localStorage.setItem("spectrogram_colour","blue-red-white"); // blue-red-white, purple-orange, black-white
+        localStorage.setItem("spectrogram_colour","blue-red-white"); // blue-red-white, purple-orange, red-blue-green, red-green, black-white
     };
     if (localStorage.getItem("spectrogram_refresh") === null) {
         localStorage.setItem("spectrogram_refresh",5); // 3, 5, 10
+    };
+    if (localStorage.getItem("waveform_colour") === null) {
+        localStorage.setItem("waveform_colour","#008EFF"); // "#008EFF" = cyan
+    };
+    if (localStorage.getItem("data_smoothing") === null) {
+        localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay
     };
     console.log("Settings initialised");
 };
@@ -40,11 +46,16 @@ const option3 = document.getElementById("settings_option3_sub");
 const option3_hidden = document.getElementById("settings_option3_hidden");
 const option3_preview = document.getElementById("settings_h3_option3");
 
+const option4 = document.getElementById("settings_option4_sub");
+const option4_hidden = document.getElementById("settings_option4_hidden");
+const option4_preview = document.getElementById("settings_h3_option4");
+
 // Functions to toggle between different settings options
 function toggle_options(no) {
     option1_hidden.style.display = "none"
     option2_hidden.style.display = "none"
     option3_hidden.style.display = "none"
+    option4_hidden.style.display = "none"
 
     if (no == 1) {
         option1_hidden.style.display = "block"
@@ -54,11 +65,15 @@ function toggle_options(no) {
     }
     else if (no == 3) {
         option3_hidden.style.display = "block"
+    }
+    else if (no == 4) {
+        option4_hidden.style.display = "block"
     };
 };
 option1.onclick = function() { toggle_options(1); };
 option2.onclick = function() { toggle_options(2); };
 option3.onclick = function() { toggle_options(3); };
+option4.onclick = function() { toggle_options(4); };
 
 // -------------------------------------------------------------------------------------
 
@@ -120,13 +135,13 @@ option1_button3_container.onclick = function() { option1_toggle_button(3); };
 option1_button4_container.onclick = function() { option1_toggle_button(4); };
 
 // Intensity Spectrum Settings:
-const box_custom_colour = document.getElementById("box_custom_colour");
-const box_custom_colour_hex = document.getElementById("box_custom_colour_hex_code");
-function custom_line_colour() {
-    localStorage.setItem("intensity_spectrum_colour",box_custom_colour.value);
-    box_custom_colour_hex.innerText = box_custom_colour.value;
+const intensity_spectrum_box_custom_colour = document.getElementById("intensity_spectrum_box_custom_colour");
+const intensity_spectrum_box_custom_colour_hex = document.getElementById("intensity_spectrum_box_custom_colour_hex_code");
+function intensity_spectrum_line_colour() {
+    localStorage.setItem("intensity_spectrum_colour",intensity_spectrum_box_custom_colour.value);
+    intensity_spectrum_box_custom_colour_hex.innerText = intensity_spectrum_box_custom_colour.value;
 };
-box_custom_colour.addEventListener("input",custom_line_colour);
+intensity_spectrum_box_custom_colour.addEventListener("input",intensity_spectrum_line_colour);
 
 const axis_scale_linear = document.getElementById("axis_scale_linear");
 const axis_scale_logarithmic = document.getElementById("axis_scale_logarithmic");
@@ -151,6 +166,7 @@ function axis_scale(no) {
 axis_scale_linear.onclick = function() { axis_scale(1); };
 axis_scale_logarithmic.onclick = function() { axis_scale(2); };
 
+// Spectrogram Settings:
 const heatmap_blue_red_white = document.getElementById("heatmap_blue-red-white");
 const heatmap_purple_orange = document.getElementById("heatmap_purple-orange");
 const heatmap_red_blue_green = document.getElementById("heatmap_red-blue-green");
@@ -221,7 +237,16 @@ spectrogram_refresh_10.onclick = function() { spectrogram_refresh(1); };
 spectrogram_refresh_5.onclick = function() { spectrogram_refresh(2); };
 spectrogram_refresh_3.onclick = function() { spectrogram_refresh(3); };
 
-// Spectrogram Settings:
+// Waveform Settings:
+const waveform_box_custom_colour = document.getElementById("waveform_box_custom_colour");
+const waveform_box_custom_colour_hex = document.getElementById("waveform_box_custom_colour_hex_code");
+function waveform_line_colour() {
+    localStorage.setItem("waveform_colour",waveform_box_custom_colour.value);
+    waveform_box_custom_colour_hex.innerText = waveform_box_custom_colour.value;
+};
+waveform_box_custom_colour.addEventListener("input",waveform_line_colour);
+
+// Softmax Settings:
 // -------------------------------------------------------------------------------------
 
 // Retrieve all necessary elements for settings option 2
@@ -270,22 +295,21 @@ option2_button4_container.onclick = function() { option2_toggle_button(4); };
 
 // -------------------------------------------------------------------------------------
 
-// Retrieve all necessary elements for settings option 2
+// Retrieve all necessary elements for settings option 3
 const option3_button1_container = document.getElementById("settings_option3_button1_selector");
 const option3_button1 = document.getElementById("settings_option3_button1");
 
 const option3_button2_container = document.getElementById("settings_option3_button2_selector");
 const option3_button2 = document.getElementById("settings_option3_button2");
 
-const option3_button3_container = document.getElementById("settings_option3_button3_selector");
-const option3_button3 = document.getElementById("settings_option3_button3");
+// const option3_button3_container = document.getElementById("settings_option3_button3_selector");
+// const option3_button3 = document.getElementById("settings_option3_button3");
 
 // Function to select option 2 settings
 function option3_toggle_button(no) {
     
     option3_button1.style.backgroundColor = "white";
     option3_button2.style.backgroundColor = "white";
-    option3_button3.style.backgroundColor = "white";
 
     if (no == 1) {
         option3_button1.style.backgroundColor = "orange";
@@ -293,17 +317,43 @@ function option3_toggle_button(no) {
     } 
     else if (no == 2) {
         option3_button2.style.backgroundColor = "orange";
-        localStorage.setItem("display_type", "trimmed mean");
-    }
-    else if (no == 3) {
-        option3_button3.style.backgroundColor = "orange";
         localStorage.setItem("display_type", "max");
     };
     update_previews();
 };
 option3_button1_container.onclick = function() { option3_toggle_button(1); };
 option3_button2_container.onclick = function() { option3_toggle_button(2); };
-option3_button3_container.onclick = function() { option3_toggle_button(3); };
+
+// -------------------------------------------------------------------------------------
+
+// Retrieve all necessary elements for settings option 3
+const option4_button1_container = document.getElementById("settings_option4_button1_selector");
+const option4_button1 = document.getElementById("settings_option4_button1");
+
+const option4_button2_container = document.getElementById("settings_option4_button2_selector");
+const option4_button2 = document.getElementById("settings_option4_button2");
+
+// const option3_button3_container = document.getElementById("settings_option3_button3_selector");
+// const option3_button3 = document.getElementById("settings_option3_button3");
+
+// Function to select option 2 settings
+function option4_toggle_button(no) {
+    
+    option4_button1.style.backgroundColor = "white";
+    option4_button2.style.backgroundColor = "white";
+
+    if (no == 1) {
+        option4_button1.style.backgroundColor = "orange";
+        localStorage.setItem("data_smoothing", "raw");
+    } 
+    else if (no == 2) {
+        option4_button2.style.backgroundColor = "orange";
+        localStorage.setItem("data_smoothing", "savitzky-golay");
+    };
+    update_previews();
+};
+option4_button1_container.onclick = function() { option4_toggle_button(1); };
+option4_button2_container.onclick = function() { option4_toggle_button(2); };
 
 // -------------------------------------------------------------------------------------
 
@@ -312,6 +362,7 @@ function update_previews() {
     option1_preview.innerText = localStorage.getItem("visualiser_type");
     option2_preview.innerText = localStorage.getItem("weighting");
     option3_preview.innerText = localStorage.getItem("display_type");
+    option4_preview.innerText = localStorage.getItem("data_smoothing");
 
     if (localStorage.getItem("visualiser_type") == "intensity spectrum") {
         option1_button1.style.backgroundColor = "orange";
@@ -346,15 +397,22 @@ function update_previews() {
     if (localStorage.getItem("display_type") == "mean") {
         option3_button1.style.backgroundColor = "orange";
     }
-    else if (localStorage.getItem("display_type") == "trimmed mean") {
-        option3_button2.style.backgroundColor = "orange";
-    }
     else if (localStorage.getItem("display_type") == "max") {
-        option3_button3.style.backgroundColor = "orange";
+        option3_button2.style.backgroundColor = "orange";
     };
 
-    box_custom_colour.value = localStorage.getItem("intensity_spectrum_colour");
-    box_custom_colour_hex.innerText = localStorage.getItem("intensity_spectrum_colour");
+    if (localStorage.getItem("data_smoothing") == "raw") {
+        option4_button1.style.backgroundColor = "orange";
+    }
+    else if (localStorage.getItem("data_smoothing") == "savitzky-golay") {
+        option4_button2.style.backgroundColor = "orange";
+    };
+
+    intensity_spectrum_box_custom_colour.value = localStorage.getItem("intensity_spectrum_colour");
+    intensity_spectrum_box_custom_colour_hex.innerText = localStorage.getItem("intensity_spectrum_colour");
+
+    waveform_box_custom_colour.value = localStorage.getItem("waveform_colour");
+    waveform_box_custom_colour_hex.innerText = localStorage.getItem("waveform_colour");
 
     if (localStorage.getItem("intensity_spectrum_axis") == "linear") {
         axis_scale_linear.style.backgroundColor = "#858585";

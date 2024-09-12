@@ -133,13 +133,13 @@ input {
     display: none;
 }
 
-#line_colour {
+#intensity_spectrum_line_colour {
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
 
-#box_custom_colour {
+#intensity_spectrum_box_custom_colour {
     margin-top: 20px;
     margin-bottom: 20px;
     margin-left: 20px;
@@ -181,6 +181,21 @@ input {
     margin-right: 30px;
     border-radius: 5px;
     border: 2.5px solid black;
+}
+
+#waveform_line_colour {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#waveform_box_custom_colour {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 @media (max-width: 800px) {

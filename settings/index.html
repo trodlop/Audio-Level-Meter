@@ -43,7 +43,7 @@
                 </div>
                 <div class="settings_option_container_template" id="settings_option1_button3_selector">
                     <div class="settings_options_button_template" id="settings_option1_button3"></div>
-                    <p class="prevent_select">Waveform (to be added)</p>
+                    <p class="prevent_select">Waveform</p>
                 </div>
                 <div class="settings_option_container_template" id="settings_option1_button4_selector">
                     <div class="settings_options_button_template" id="settings_option1_button4"></div>
@@ -54,9 +54,9 @@
                 <div id="settings_option1_hidden_sub">
                     <div class="settings_option1_sub_settings" id="intensity_spectrum_settings">
                         <h2>Line Colour</h2>
-                        <div id="line_colour">
-                                <input id="box_custom_colour" type="color">
-                                <h4 id="box_custom_colour_hex_code"></h4>
+                        <div id="intensity_spectrum_line_colour">
+                                <input id="intensity_spectrum_box_custom_colour" type="color">
+                                <h4 id="intensity_spectrum_box_custom_colour_hex_code"></h4>
                         </div>
                         
                         <h2>X Axis Scale</h2>
@@ -70,6 +70,7 @@
                         </div>
                         
                     </div>
+
                     <div class="settings_option1_sub_settings" id="spectrogram_settings">
                         <h2>Heatmap Colour</h2>
                         <div id="heatmap_colour">
@@ -92,8 +93,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="settings_option1_sub_settings" id="waveform_settings"></div>
-                    <div class="settings_option1_sub_settings" id="softmax_settings"></div>
+
+                    <div class="settings_option1_sub_settings" id="waveform_settings">
+                        <h2>Line Colour</h2>
+                        <div id="waveform_line_colour">
+                                <input id="waveform_box_custom_colour" type="color">
+                                <h4 id="waveform_box_custom_colour_hex_code"></h4>
+                        </div>
+                    </div>
+
+                    <div class="settings_option1_sub_settings" id="softmax_settings">
+
+                    </div>
                 </div>
 
             </div>
@@ -139,7 +150,7 @@
         <div class="settings_options_template" id="settings_option3">
 
             <div class="settings_options_sub" id="settings_option3_sub">
-                <h2 class="settings_h2 prevent_select">DECIBELS DISPLAY TYPE</h2>
+                <h2 class="settings_h2 prevent_select">SOUND LEVEL TYPE</h2>
                 <h3 class="prevent_select" id="settings_h3_option3"></h3>
             </div>
 
@@ -150,11 +161,31 @@
                 </div>
                 <div class="settings_option_container_template" id="settings_option3_button2_selector">
                     <div class="settings_options_button_template" id="settings_option3_button2"></div>
-                    <p class="prevent_select">Trimmed Mean (to be added)</p>
-                </div>
-                <div class="settings_option_container_template" id="settings_option3_button3_selector">
-                    <div class="settings_options_button_template" id="settings_option3_button3"></div>
                     <p class="prevent_select">Maximum</p>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="settings_options_separator">
+            <div class="settings_options_separator_sub"></div>
+        </div>
+
+        <div class="settings_options_template" id="settings_option4">
+
+            <div class="settings_options_sub" id="settings_option4_sub">
+                <h2 class="settings_h2 prevent_select">DATA SMOOTHING</h2>
+                <h3 class="prevent_select" id="settings_h3_option4">raw</h3>
+            </div>
+
+            <div class="settings_options_hidden" id="settings_option4_hidden">
+                <div class="settings_option_container_template" id="settings_option4_button1_selector">
+                    <div class="settings_options_button_template" id="settings_option4_button1"></div>
+                    <p class="prevent_select">Raw (no smoothing)</p>
+                </div>
+                <div class="settings_option_container_template" id="settings_option4_button2_selector">
+                    <div class="settings_options_button_template" id="settings_option4_button2"></div>
+                    <p class="prevent_select">Savitzky-Golay Filter</p>
                 </div>
             </div>
             
@@ -162,7 +193,7 @@
 
     </main>
 
-    <p>Version 1.40 - c</p> <!-- a = visual update, b = functional update, c = feature update -->
+    <p>Version 2.21 - c</p> <!-- a = visual update, b = functional update, c = feature update -->
     
 </body>
 
