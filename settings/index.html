@@ -212,7 +212,7 @@
                 <h4>Waveform</h4>
                 <p>This shows the amplitude of the sound wave at a specific point in time, essentially giving a side profile of how the sound wave "looks".</p>
                 <h4>Softmax Intensity Spectrum</h4>
-                <p>This plots the intensity of each frequency interval, but uses a softmax algorithm to normalise the intensities to between 0 and 1, and such that they add up to 1. This allows for identification of particularly loud frequencies, as the algorithm "exaggerates" outlying intensities.</p>
+                <p>This plots the intensity of each frequency interval, but uses a min-max-normalisation algorithm to normalise the intensities to between 0 and 1. This allows for identification of particularly loud frequencies and comparison of intensities between frequencies.</p>
 
                 <h2>Frequency Weighting</h2>
                 <p>Frequency weighting refers to "weighting" certain frequencies such that they are louder or quieter. For exmaple, the human ear is more sensitive to mid-range frequencies (1 - 3kHz), and thus percieves them more loudly. We can therefore mimic how humans will percieve the sound level by boosting the levels of the mid-level frequencies.</p>
