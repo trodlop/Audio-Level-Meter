@@ -191,9 +191,62 @@
             
         </div>
 
+        <div class="settings_options_separator">
+            <div class="settings_options_separator_sub"></div>
+        </div>
+
+        <div class="settings_options_template" id="settings_option_glossary">
+
+            <div class="settings_options_sub" id="settings_option_glossary_sub">
+                <h2 class="settings_h2 prevent_select">GLOSSARY</h2>
+                <h3 class="prevent_select" id="settings_h3_option_glossary">descriptions</h3>
+            </div>
+
+            <div class="settings_options_hidden" id="settings_option_glossary_hidden">
+
+                <h2>Visualiser Types</h2>
+                <h4>Frequency Intensity Spectrum</h4>
+                <p>A frequency intensity spectrum displays the intensity (in Decibels) of the sound input at each specific frequency interval, in this case ~45Hz intervals. Note that, the intensity of the sound at each interval is measured by how far it is from the maximum achievable sound level. Since each microphone has a different maximum sound level, calibration is necessary to accurately measure sound levels. It is useful for measuring the loudness specfic frequencies.</p>
+                <h4>Spectrogram</h4>
+                <p>A spectrogram displays the intensity of the sound input at each frequency at each point in time. Depending on selected colour for the spectrogram, different colours represent different sound intensities. Usually the brighter and "hotter" the colour, the more intense the sound level at that frequency interval. The X axis shows the time since recording (in seconds), ie. -20 means that slice was recorded 20 seconds earlier. It is useful for visualising the sound levels over time, while still giving information about loudness of individual frequencies.</p>
+                <h4>Waveform</h4>
+                <p>This shows the amplitude of the sound wave at a specific point in time, essentially giving a side profile of how the sound wave "looks".</p>
+                <h4>Softmax Intensity Spectrum</h4>
+                <p>This plots the intensity of each frequency interval, but uses a softmax algorithm to normalise the intensities to between 0 and 1, and such that they add up to 1. This allows for identification of particularly loud frequencies, as the algorithm "exaggerates" outlying intensities.</p>
+
+                <h2>Frequency Weighting</h2>
+                <p>Frequency weighting refers to "weighting" certain frequencies such that they are louder or quieter. For exmaple, the human ear is more sensitive to mid-range frequencies (1 - 3kHz), and thus percieves them more loudly. We can therefore mimic how humans will percieve the sound level by boosting the levels of the mid-level frequencies.</p>
+                <h4>ITU-R 468</h4>
+                <p>A widely used frequency weighting, mainly used in the UK, Europe and Australia. It boosts the mid-high-range frequencies (1 - 10kHz) while reducing frequencies above and below this. It is particularly useful when measuring levels in audio systems where clarity is most important.</p>
+                <h4>A</h4>
+                <p>The most commonly used frequency weighting, as it most accurately mimics the human ear's frequency response. A weighting aggressively reduces the loudness of frequencies below 1kHz, while keeping the mid-high-range frequencies fairly flat.</p>
+                <h4>C</h4>
+                <p>C weighting is not used as often as A or ITU-R 468, however it is useful for measuring the peak sound level of very loud impulsive sources, such as heavy machinery. It has a flatter weighting than A or ITU-R 468 weightings.</p>
+                <h4>Z</h4>
+                <p>Z weighting or Zero weighting applies no weighting to the incoming sound level. While it is useful for measuring the actual sound level, it does not accurately mimic the frequency response of a human ear, and so actual sound levels may not refelect percieved sound levels.</p>
+
+                <h2>Sound Level Type</h2>
+                <h4>Max</h4>
+                <p>Simply displays the maximum sound level recorded in that instant. It is important to note that maximum sound levels do not reflect true sound levels. However, measuring maximum sound levels can be used to assess safe sound levels.</p>
+                <h4>Mean</h4>
+                <p>Calculates the mean average sound level recorded in that instant. It more accurately reflects the true sound level recorded over time.</p>
+
+                <h2>Data Smoothing</h2>
+                <p>Smoothing functions are used to smooth out the recorded sound data. Different smoothing functions can be used to achieve different results, for example, to smooth out anomalous peaks and troughs, while still keeping the genaral shape of the dataset.</p>
+                <h4>Raw (no smoothing)</h4>
+                <p>This applies no smoothing to the data, keeping the data raw. Applying no smoothing to the data can help identify particularly high sound levels.</p>
+                <h4>Savitzky-Golay Filter</h4>
+                <p>A Savitzky-Golay Filter is a smoothing function used to smooth out anomalous data points, while still keeping the shape of the dataset. It makes it easier to see the general shape of the data, as it smoothes out the "bumpiness".</p>
+
+                <div class="spacer"></div>
+
+            </div>
+            
+        </div>
+
     </main>
 
-    <p>Version 2.21 - c</p> <!-- a = visual update, b = functional update, c = feature update -->
+    <p>Version 3.10 - a</p> <!-- a = visual update, b = functional update, c = feature update -->
     
 </body>
 
