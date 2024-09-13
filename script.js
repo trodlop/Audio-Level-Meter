@@ -758,6 +758,14 @@ function toggle_play() {
     }
 };
 play.addEventListener("click", toggle_play);
+window.addEventListener("keydown", function(key) { // Event listener to call toggle_play() whenever the spacebar is pressed
+    // Check if the pressed key is the spacebar
+    if (key.code === "Space") {
+        
+        key.preventDefault(); // Prevent the default action (e.g., scrolling the page)
+        toggle_play(); // Call the toggle_play() function
+    };
+});
 
 // Applies weighting to each frequency interval (A, Z, ITU-R-468)
 function apply_weighting() {
@@ -949,6 +957,7 @@ function update_decibels_display(Decibels) {
     avg_display.innerText = num;
 };
 
+// Saves the Decibels array data into a dedicated array
 function save_data_txt(dataset) {
     const download_type = localStorage.getItem("download_type");
 
@@ -972,11 +981,12 @@ function download_data_txt(dataset_simple, dataset_full) {
 
     // Content formatting for download
     for (let i = 0; i < dataset_simple.length; i++) {
-        temp_array.push(dataset_simple[i])
+        temp_array.push(dataset_simple[i]);
     };
     temp_array.push("\n");
     for (let i = 0; i < dataset_full.length; i++) {
-        temp_array.push(dataset_full[i])
+        temp_array.push(dataset_full[i]);
+        temp_array.push("\n");
     };
 
     const content = (temp_array.join("\n")); // Convert the dataset to a string, putting each item on a new line
@@ -990,10 +1000,8 @@ function download_data_txt(dataset_simple, dataset_full) {
     download_link.click(); // Programmatically click the link to trigger the download
 
     URL.revokeObjectURL(download_link.href); // Revoke the Blob URL to free up memory
-    document.body.removeChild(download_link); // Removes anchor element after download is completed
 
     console.log("Data downloaded");
-    
 };
 download_button.onclick = function() { download_data_txt(simple_save_data, full_save_data); };
 
@@ -1021,7 +1029,7 @@ calibrationSlider.addEventListener('input', function() {
 //TODO                              softmax line colour
 //TODO                              softmax settings
 //?                                 intensity spectrum data visualisation type (raw or smoothed) (add more smoothing options)
-//TODO                              download type (simple, full)
+//                                  download type (simple, full)
 
 //?             Add smoothing function to Decibels array (add more smoothing options)
 //TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
@@ -1030,5 +1038,6 @@ calibrationSlider.addEventListener('input', function() {
 //              Add softmax visualisation
 //              Add correct decibel and VU meter display for when waveform and softmax is selected
 //              Allow downloading of data
+//              Event listener for spacebar play toggle
 
 //TODO          Link main page to portfolio website
