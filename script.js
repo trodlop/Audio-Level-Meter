@@ -44,13 +44,21 @@ function initialise_settings() {
     if (localStorage.getItem("data_smoothing") === null) {
         localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay
     };
+    if (localStorage.getItem("download_type") === null) {
+        localStorage.setItem("download_type","simple"); // simple, full
+    };
     console.log("Settings initialised");
 };
 initialise_settings();
 
+let simple_save_data = []; // Array for storing max, avg, runtime data for download
+let full_save_data = []; // Array for storing Decibels array data for download
+let runtime = 0; // Keeps track of runtime 
+
 let array; // Array for temporary use case
 let Data; // Array storing frequency data directly from AudioAPI
 let Decibels = []; // Array for storing frequency intensity (calculated from frequencyData array)
+let Amplitudes = []; // Array for storing amplitudes (calculated from floatTimeDomainData)
 let normalized_data_array = []; // Array for storing normalised frequency intensity
 let mediaStream = null; // Object to handle incoming audio data from microphone
 let capture_interval_id = null; // To store the interval ID
@@ -58,6 +66,7 @@ let capture_interval_id = null; // To store the interval ID
 const display_type = localStorage.getItem("display_type"); // "mean" = mean average intensity, "trimmed mean" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
 let maximum = 0; // Maximum value of recorded sound levels
+let minimum = 0; // Minimum value of maximum recorded sound levels
 let maximum_sum = 0; // Keeps sum of recorded audio level values (numerator for maximum average)
 let maximum_counter = 0; // Counts number of recorded audio level values (divisor for maximum average)
 let calibration = 0; // Default calibration
@@ -604,32 +613,54 @@ async function connect_microphone() {
     };
 };
 
-function captureAudioData() {
+function capture_audio_data() {
     // Get the frequency data from the analyser
     if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
         analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
-        // Adjust the data and save in Decibels Array
-        Decibels = Data.map(value => value + 120 + calibration); // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
+        Decibels = Data.map(value => value + 120 + calibration); // Adjust the data and save in Decibels Array
+        // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
     }
     else if (visualiser_type == "waveform") {
         analyser.getFloatTimeDomainData(Data); // Gets array of amplitude values over given time interval (~ 0.0023ms)
-        // Save data in Decibels array
-        Decibels = Data.map(value => value);
+        Amplitudes = Data.map(value => value); // Save data in Amplitudes array
+
+        analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
+        Decibels = Data.map(value => value + 120 + calibration); // Adjust the data and save in Decibels Array        
+        // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
     };
 
     apply_weighting(); // Applies any weighting selected
     apply_smoothing(); // Applies any smoothing function selected
 
-    if (visualiser_type == "softmax") { // Normalises Decibels to be between 0 and 1, then exponentiates
+    if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram") {
+        calc_average(); // Calculates average current sound level (to be used for VU meter)
+
+        update_meter_display(average) // Updates VU meter showing average current sound level
+        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+        update_visualiser(Decibels); // Updates the visualiser
+    }
+    else if (visualiser_type == "waveform") { // Normalises Decibels to be between 0 and 1, then exponentiates
+
+        calc_average(); // Calculates average current sound level (to be used for VU meter)
+
+        update_meter_display(average) // Updates VU meter showing average current sound level
+        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+
+        update_visualiser(Amplitudes); // Updates the visualiser
+    }
+    else if (visualiser_type == "softmax") { // Normalises Decibels to be between 0 and 1, then exponentiates
+
+        calc_average(); // Calculates average current sound level (to be used for VU meter)
+
+        update_meter_display(average) // Updates VU meter showing average current sound level
+        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+
         Decibels = normalize_data(Decibels);
-        // console.log(Decibels);
+        update_visualiser(Decibels); // Updates the visualiser
     };
 
-    calc_average(); // Calculates average current sound level (to be used for VU meter)
-
-    update_meter_display() // Updates VU meter showing average current sound level
-    update_decibels_display(); // Updates all decibel meter displays (max, avg and current)
-    update_visualiser(); // Updates the visualiser
+    save_data_txt(Decibels); // Updates/saves data to save_data array
+    runtime += 100; // Counts up to keep track of runtime (ms)
 };
 
 function calc_average() {
@@ -692,7 +723,7 @@ function Play() {
         connect_microphone().then(() => {
             // After successfully connecting, start the interval
             if (!capture_interval_id) { // Only set a new interval if one is not already running
-                capture_interval_id = setInterval(captureAudioData, refresh_interval); // refresh_interval
+                capture_interval_id = setInterval(capture_audio_data, refresh_interval); // refresh_interval
             }
         }).catch(err => {
             console.error("Failed to connect to the microphone.");
@@ -700,7 +731,7 @@ function Play() {
     } else {
         // If already connected, start capturing audio
         if (!capture_interval_id) {
-            capture_interval_id = setInterval(captureAudioData, refresh_interval);
+            capture_interval_id = setInterval(capture_audio_data, refresh_interval);
         }
     }
 };
@@ -714,7 +745,6 @@ function Pause() {
 };
 
 let is_playing = false; // Toggle between currently playing or paused
-
 function toggle_play() {
     if (is_playing == false) {
         is_playing = true
@@ -727,7 +757,6 @@ function toggle_play() {
         Pause()
     }
 };
-
 play.addEventListener("click", toggle_play);
 
 // Applies weighting to each frequency interval (A, Z, ITU-R-468)
@@ -839,10 +868,10 @@ function savitzky_golay(Data) {
 
 let counter = 0 // Counter for visualiser timing
 // Updates data in the visualiser (graph, spectrogram, etc.)
-function update_visualiser() {
+function update_visualiser(dataset) {
 
     if (visualiser_type == "intensity spectrum") {
-        visualiser.data.datasets[0].data = Decibels
+        visualiser.data.datasets[0].data = dataset
         visualiser.update(); // Redraw the chart with updated data
     }
     else if (visualiser_type == "spectrogram") {
@@ -858,30 +887,28 @@ function update_visualiser() {
         };
     }
     else if (visualiser_type == "waveform") {
-        visualiser.data.datasets[0].data = Decibels
+        visualiser.data.datasets[0].data = dataset
         visualiser.update(); // Redraw the chart with updated data
     }
     else if (visualiser_type == "softmax") {
-        visualiser.data.datasets[0].data = Decibels
+        visualiser.data.datasets[0].data = dataset
         visualiser.update(); // Redraw the chart with updated data
     };
 };
 
 let width = 0;
-
 // Calculates width of meter display
 function calc_meter_width() {
     
     width = document.body.clientWidth * 0.2;
     
 };
-
 // Recalculates width of the meter display when ever window gets refreshed or resized
 window.onload = calc_meter_width; 
 window.onresize = calc_meter_width; 
 
 // Updates the VU meter showing average sound level
-function update_meter_display() {
+function update_meter_display(average) {
     
     if (average <= 0) {
         meter_arrow.style.left = "0.8vw"
@@ -896,37 +923,81 @@ function update_meter_display() {
 }; 
 
 // Updates the display showing sound level, maximum and average maximum
-function update_decibels_display() {
+function update_decibels_display(Decibels) {
     let num;
 
-    if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram") {
-
-        if (display_type == "max") {
-            num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
-            num = parseFloat(num); // Makes sure to return a number
-            num = num.toFixed(1); // Returns float to 1 decimal place
-            decibels_display.innerText = num;
-        }
-        else {
-            decibels_display.innerText = average;
-        };
-    
-        if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
-            maximum = decibels_display.innerText
-            max_display.innerText = maximum        
-        };
-    
-        maximum_sum += parseFloat(decibels_display.innerText);
-        maximum_counter += 1;
-        num = maximum_sum / maximum_counter;
-        num = parseFloat(num);
-        num = num.toFixed(1);
-        avg_display.innerText = num;
+    if (display_type == "max") {
+        num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
+        num = parseFloat(num); // Makes sure to return a number
+        num = num.toFixed(1); // Returns float to 1 decimal place
+        decibels_display.innerText = num;
+    }
+    else {
+        decibels_display.innerText = average;
     };
+
+    if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
+        maximum = decibels_display.innerText
+        max_display.innerText = maximum        
+    };
+
+    maximum_sum += parseFloat(decibels_display.innerText);
+    maximum_counter += 1;
+    num = maximum_sum / maximum_counter;
+    num = parseFloat(num);
+    num = num.toFixed(1);
+    avg_display.innerText = num;
 };
 
-const calibrationSlider = document.getElementById('calibration_slider');
+function save_data_txt(dataset) {
+    const download_type = localStorage.getItem("download_type");
 
+    if (download_type == "full") { // Saves every recorded Decibels array 
+        full_save_data.push(dataset);
+    };
+
+    simple_save_data = [`Maximum: ${max_display.innerText}`,`Average: ${avg_display.innerText}`,`Runtime: ${runtime}ms`,"",];
+};
+
+const download_button = document.getElementById("download");
+// Creates a .txt file to save the Decibels data and then downloads it
+function download_data_txt(dataset_simple, dataset_full) {
+
+    if (dataset_simple.length === 0 && dataset_full.length === 0) {
+        console.log("Dataset is empty, nothing to download.");
+        alert("No data to download")
+        return; // Exit the function if the dataset is empty
+    };
+    let temp_array = [];
+
+    // Content formatting for download
+    for (let i = 0; i < dataset_simple.length; i++) {
+        temp_array.push(dataset_simple[i])
+    };
+    temp_array.push("\n");
+    for (let i = 0; i < dataset_full.length; i++) {
+        temp_array.push(dataset_full[i])
+    };
+
+    const content = (temp_array.join("\n")); // Convert the dataset to a string, putting each item on a new line
+
+    const blob = new Blob([content], { type: "text/plain" }); // Create a Blob with the content
+
+    const download_link = document.createElement("a"); // Create a link element
+
+    download_link.href = URL.createObjectURL(blob); // Set the href to the Blob URL
+    download_link.download = "data.txt"; // Set the download attribute to specify the file name
+    download_link.click(); // Programmatically click the link to trigger the download
+
+    URL.revokeObjectURL(download_link.href); // Revoke the Blob URL to free up memory
+    document.body.removeChild(download_link); // Removes anchor element after download is completed
+
+    console.log("Data downloaded");
+    
+};
+download_button.onclick = function() { download_data_txt(simple_save_data, full_save_data); };
+
+const calibrationSlider = document.getElementById('calibration_slider');
 // Calibrates the sound level by increasing or decreasing decibels (linear calibration)
 calibrationSlider.addEventListener('input', function() {
     calibration = parseFloat(calibrationSlider.value); // Get the slider value and convert it to a number
@@ -950,12 +1021,14 @@ calibrationSlider.addEventListener('input', function() {
 //TODO                              softmax line colour
 //TODO                              softmax settings
 //?                                 intensity spectrum data visualisation type (raw or smoothed) (add more smoothing options)
+//TODO                              download type (simple, full)
 
 //?             Add smoothing function to Decibels array (add more smoothing options)
 //TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
 //              Add Spectrogram visualisation
 //              Add Waveform visualisation
-//TODO          Add softmax visualisation
-//TODO          Add correct decibel and VU meter display for when waveform is selected
+//              Add softmax visualisation
+//              Add correct decibel and VU meter display for when waveform and softmax is selected
+//              Allow downloading of data
 
 //TODO          Link main page to portfolio website
