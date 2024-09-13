@@ -50,37 +50,46 @@ const option4 = document.getElementById("settings_option4_sub");
 const option4_hidden = document.getElementById("settings_option4_hidden");
 const option4_preview = document.getElementById("settings_h3_option4");
 
+const option5 = document.getElementById("settings_option5_sub");
+const option5_hidden = document.getElementById("settings_option5_hidden");
+const option5_preview = document.getElementById("settings_h3_option5");
+
 const option_glossary = document.getElementById("settings_option_glossary_sub");
 const option_glossary_hidden = document.getElementById("settings_option_glossary_hidden");
 
 // Functions to toggle between different settings options
 function toggle_options(no) {
-    option1_hidden.style.display = "none"
-    option2_hidden.style.display = "none"
-    option3_hidden.style.display = "none"
-    option4_hidden.style.display = "none"
-    option_glossary_hidden.style.display = "none"
+    option1_hidden.style.display = "none";
+    option2_hidden.style.display = "none";
+    option3_hidden.style.display = "none";
+    option4_hidden.style.display = "none";
+    option5_hidden.style.display = "none";
+    option_glossary_hidden.style.display = "none";
 
     if (no == 1) {
-        option1_hidden.style.display = "block"
+        option1_hidden.style.display = "block";
     }
     else if (no == 2) {
-        option2_hidden.style.display = "block"
+        option2_hidden.style.display = "block";
     }
     else if (no == 3) {
-        option3_hidden.style.display = "block"
+        option3_hidden.style.display = "block";
     }
     else if (no == 4) {
-        option4_hidden.style.display = "block"
+        option4_hidden.style.display = "block";
+    }
+    else if (no == 5) {
+        option5_hidden.style.display = "block";
     }
     else if (no == "glossary") {
-        option_glossary_hidden.style.display = "block"
+        option_glossary_hidden.style.display = "block";
     };
 };
 option1.onclick = function() { toggle_options(1); };
 option2.onclick = function() { toggle_options(2); };
 option3.onclick = function() { toggle_options(3); };
 option4.onclick = function() { toggle_options(4); };
+option5.onclick = function() { toggle_options(5); };
 option_glossary.onclick = function() { toggle_options("glossary"); };
 
 // -------------------------------------------------------------------------------------
@@ -313,7 +322,7 @@ const option3_button2 = document.getElementById("settings_option3_button2");
 // const option3_button3_container = document.getElementById("settings_option3_button3_selector");
 // const option3_button3 = document.getElementById("settings_option3_button3");
 
-// Function to select option 2 settings
+// Function to select option 3 settings
 function option3_toggle_button(no) {
     
     option3_button1.style.backgroundColor = "white";
@@ -334,17 +343,17 @@ option3_button2_container.onclick = function() { option3_toggle_button(2); };
 
 // -------------------------------------------------------------------------------------
 
-// Retrieve all necessary elements for settings option 3
+// Retrieve all necessary elements for settings option 4
 const option4_button1_container = document.getElementById("settings_option4_button1_selector");
 const option4_button1 = document.getElementById("settings_option4_button1");
 
 const option4_button2_container = document.getElementById("settings_option4_button2_selector");
 const option4_button2 = document.getElementById("settings_option4_button2");
 
-// const option3_button3_container = document.getElementById("settings_option3_button3_selector");
-// const option3_button3 = document.getElementById("settings_option3_button3");
+// const option4_button3_container = document.getElementById("settings_option4_button3_selector");
+// const option4_button3 = document.getElementById("settings_option4_button3");
 
-// Function to select option 2 settings
+// Function to select option 4 settings
 function option4_toggle_button(no) {
     
     option4_button1.style.backgroundColor = "white";
@@ -365,12 +374,44 @@ option4_button2_container.onclick = function() { option4_toggle_button(2); };
 
 // -------------------------------------------------------------------------------------
 
+// Retrieve all necessary elements for settings option 5
+const option5_button1_container = document.getElementById("settings_option5_button1_selector");
+const option5_button1 = document.getElementById("settings_option5_button1");
+
+const option5_button2_container = document.getElementById("settings_option5_button2_selector");
+const option5_button2 = document.getElementById("settings_option5_button2");
+
+// const option5_button3_container = document.getElementById("settings_option5_button3_selector");
+// const option5_button3 = document.getElementById("settings_option5_button3");
+
+// Function to select option 5 settings
+function option5_toggle_button(no) {
+    
+    option5_button1.style.backgroundColor = "white";
+    option5_button2.style.backgroundColor = "white";
+
+    if (no == 1) {
+        option5_button1.style.backgroundColor = "orange";
+        localStorage.setItem("download_type", "simple");
+    } 
+    else if (no == 2) {
+        option5_button2.style.backgroundColor = "orange";
+        localStorage.setItem("download_type", "full");
+    };
+    update_previews();
+};
+option5_button1_container.onclick = function() { option5_toggle_button(1); };
+option5_button2_container.onclick = function() { option5_toggle_button(2); };
+
+// -------------------------------------------------------------------------------------
+
 // Update selected options preview (NOTE: needs to be last such that toggle variables have already been declared)
 function update_previews() {
     option1_preview.innerText = localStorage.getItem("visualiser_type");
     option2_preview.innerText = localStorage.getItem("weighting");
     option3_preview.innerText = localStorage.getItem("display_type");
     option4_preview.innerText = localStorage.getItem("data_smoothing");
+    option5_preview.innerText = localStorage.getItem("download_type");
 
     if (localStorage.getItem("visualiser_type") == "intensity spectrum") {
         option1_button1.style.backgroundColor = "orange";
@@ -414,6 +455,13 @@ function update_previews() {
     }
     else if (localStorage.getItem("data_smoothing") == "savitzky-golay") {
         option4_button2.style.backgroundColor = "orange";
+    };
+
+    if (localStorage.getItem("download_type") == "simple") {
+        option5_button1.style.backgroundColor = "orange";
+    }
+    else if (localStorage.getItem("download_type") == "full") {
+        option5_button2.style.backgroundColor = "orange";
     };
 
     intensity_spectrum_box_custom_colour.value = localStorage.getItem("intensity_spectrum_colour");
