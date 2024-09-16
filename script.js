@@ -44,7 +44,7 @@ function initialise_settings() {
     if (localStorage.getItem("data_smoothing") === null) {
         localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay, moving average (mean), moving average (median)
     };
-    if (localStorage.getItem("moving_average_window") === null) {
+    if (localStorage.getItem("moving_average_window") === null  || localStorage.getItem("moving_average_window") != 11) {
         localStorage.setItem("moving_average_window",11); // 0 < int < Decibels.length
     };
     if (localStorage.getItem("download_type") === null) {
