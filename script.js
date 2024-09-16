@@ -68,10 +68,12 @@ let capture_interval_id = null; // To store the interval ID
 
 const display_type = localStorage.getItem("display_type"); // "mean" = mean average intensity, "trimmed mean" = mean average while eliminating any outlying intensities, "max" = maximum value
 let average = 0; // Mean average to be used for VU meter reading
-let maximum = 0; // Maximum value of recorded sound levels
-let minimum = 0; // Minimum value of maximum recorded sound levels
-let maximum_sum = 0; // Keeps sum of recorded audio level values (numerator for maximum average)
-let maximum_counter = 0; // Counts number of recorded audio level values (divisor for maximum average)
+let maximum = 0; // Maximum value of averaged sound levels
+let minimum = null; // Minimum value of averaged sound levels
+let peak = 0; // Peak value of recorded sound levels
+let leq = 0; // LEQ of recorded audio
+let leq_sum = 0; // Keeps sum of recorded audio level values (numerator for leq)
+let leq_counter = 0; // Counts number of recorded audio level values (divisor for leq)
 let calibration = 0; // Default calibration
 const w = localStorage.getItem("weighting"); // "a" = A Weighting, "itu r" = ITU R 468 Weighting, "z" = Z (zero) Weighting
 const smoothing = localStorage.getItem("data_smoothing"); // "raw" = no smoothing, "savitzky-golay" = savitzky-golay filter
@@ -616,6 +618,7 @@ async function connect_microphone() {
     };
 };
 
+// Function to capture audio data and acts as main loop
 function capture_audio_data() {
     // Get the frequency data from the analyser
     if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
@@ -634,29 +637,22 @@ function capture_audio_data() {
 
     apply_weighting(); // Applies any weighting selected
     apply_smoothing(); // Applies any smoothing function selected
+    calc_min_max_peak_leq(Decibels); // Updates/calculates new min, max, peak and leq
 
     if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram") {
-        calc_average(); // Calculates average current sound level (to be used for VU meter)
-
         update_meter_display(average) // Updates VU meter showing average current sound level
-        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+        update_decibels_display(); // Updates all decibel meter displays (max, avg and current)
         update_visualiser(Decibels); // Updates the visualiser
     }
     else if (visualiser_type == "waveform") { // Normalises Decibels to be between 0 and 1, then exponentiates
-
-        calc_average(); // Calculates average current sound level (to be used for VU meter)
-
         update_meter_display(average) // Updates VU meter showing average current sound level
-        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+        update_decibels_display(); // Updates all decibel meter displays (max, avg and current)
 
         update_visualiser(Amplitudes); // Updates the visualiser
     }
     else if (visualiser_type == "softmax") { // Normalises Decibels to be between 0 and 1, then exponentiates
-
-        calc_average(); // Calculates average current sound level (to be used for VU meter)
-
         update_meter_display(average) // Updates VU meter showing average current sound level
-        update_decibels_display(Decibels); // Updates all decibel meter displays (max, avg and current)
+        update_decibels_display(); // Updates all decibel meter displays (max, avg and current)
 
         Decibels = normalize_data(Decibels);
         update_visualiser(Decibels); // Updates the visualiser
@@ -666,12 +662,11 @@ function capture_audio_data() {
     runtime += 100; // Counts up to keep track of runtime (ms)
 };
 
-function calc_average() {
-
+// Calculates min, max, peak and leq data for display and download
+function calc_min_max_peak_leq(Decibels) {
+    // Calculate current average:
     let sum = 0;
     let valid_count = 0;
-
-    // console.log(Decibels);
     
     for (let i = 0; i < Decibels.length; i++) {
 
@@ -680,20 +675,45 @@ function calc_average() {
             sum += value; // Sums all values in array
             valid_count += 1;
         };
-
     };
 
     average = sum / valid_count; // Calculates mean average of array
-
     average = Math.log10(average) * 10; // Converts back into decibel scale
 
     if (isNaN(average)) { // Checks for edge case where tries to divide 0 by 0 and returns NaN (happens when all Decibel values are negative)
         average = 0
     };
-
     average = parseFloat(average); // Makes sure to return a number
     average = average.toFixed(1); // Returns float to 1 decimal place
 
+    // Calculate peak:
+    let peak_temp = 0;
+
+    peak_temp = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
+    peak_temp = parseFloat(peak_temp); // Makes sure to return a number
+    peak_temp = peak_temp.toFixed(1); // Returns float to 1 decimal place
+    if (peak < peak_temp) {
+        peak = peak_temp;
+    };
+
+    // Calculate maximum:
+    if (maximum < average) {
+        maximum = average;
+    };
+
+    // calculate minimum:
+    if (minimum == null || minimum > average) {
+        minimum = average;
+    };
+
+    // Calculate LEQ:
+    let num = 0;
+    leq_sum += parseFloat(decibels_display.innerText);
+    leq_counter += 1;
+    num = leq_sum / leq_counter;
+    num = parseFloat(num);
+    num = num.toFixed(1);
+    leq = num;
 };
 
 // Stores normalised intensity data
@@ -721,6 +741,7 @@ function normalize_data(Decibels) {
     };
 };
 
+// Creates a loop to loop over capture_audio_data()
 function Play() {
     if (!mediaStream) { // Check if the microphone is not connected
         connect_microphone().then(() => {
@@ -739,6 +760,7 @@ function Play() {
     }
 };
 
+// Removes loop from capture_audio_data()
 function Pause() {
     // Clear the interval using the stored interval ID
     if (capture_interval_id) {
@@ -747,6 +769,7 @@ function Pause() {
     }
 };
 
+// Toggles between play and pause states 
 let is_playing = false; // Toggle between currently playing or paused
 function toggle_play() {
     if (is_playing == false) {
@@ -977,30 +1000,17 @@ function update_meter_display(average) {
 }; 
 
 // Updates the display showing sound level, maximum and average maximum
-function update_decibels_display(Decibels) {
-    let num;
-
+function update_decibels_display() {
     if (display_type == "max") {
-        num = Math.max.apply(Math, Decibels); // Finds the highest value in the Decibels array
-        num = parseFloat(num); // Makes sure to return a number
-        num = num.toFixed(1); // Returns float to 1 decimal place
-        decibels_display.innerText = num;
+        decibels_display.innerText = peak;
     }
     else {
         decibels_display.innerText = average;
     };
 
-    if (parseFloat(decibels_display.innerText) >= maximum) { // Only updates display if current maximum is exceeded
-        maximum = decibels_display.innerText
-        max_display.innerText = maximum        
-    };
+    max_display.innerText = maximum;
 
-    maximum_sum += parseFloat(decibels_display.innerText);
-    maximum_counter += 1;
-    num = maximum_sum / maximum_counter;
-    num = parseFloat(num);
-    num = num.toFixed(1);
-    avg_display.innerText = num;
+    avg_display.innerText = leq;
 };
 
 // Saves the Decibels array data into a dedicated array
@@ -1011,7 +1021,7 @@ function save_data_txt(dataset) {
         full_save_data.push(dataset);
     };
 
-    simple_save_data = [`Maximum: ${max_display.innerText}`,`Average: ${avg_display.innerText}`,`Runtime: ${runtime}ms`,"",];
+    simple_save_data = [`Maximum: ${maximum}dB`,`Minimum: ${minimum}dB`,`Peak: ${peak}dB`,`LEQ: ${leq}dB`,`Runtime: ${runtime}ms`,`Calibration: ${calibration_display.innerText}dB`,`Frequency Weighting: ${localStorage.getItem("weighting")}`,`Data Smoothing: ${localStorage.getItem("data_smoothing")}`,"",];
 };
 
 const download_button = document.getElementById("download");
@@ -1073,7 +1083,7 @@ calibrationSlider.addEventListener("input", function() {
 //                                  spectrogram refresh rate
 //                                  waveform line colour
 //TODO                              softmax line colour
-//TODO                              softmax settings (bar or line)
+//TODO                              softmax settings (linear axis or logarithmic, bar or line)
 //                                  intensity spectrum data visualisation type (raw or smoothed + different types of smoothing)
 //                                  moving average smoothing window size (smaller = less smoothing, wider = more smoothing)
 //                                  download type (simple, full)
@@ -1085,6 +1095,9 @@ calibrationSlider.addEventListener("input", function() {
 //              Add softmax visualisation
 //              Add correct decibel and VU meter display for when waveform and softmax is selected
 //              Allow downloading of data
+//              Add calibration, frequency weighting and data smoothing to downloaded data
+//              Add Min, Max, Peak and LEQ and add to downloaded data
+//TODO          Add option to overlay different datasets on frequency intensity spectrum (ie. reference or target lines)
 //              Event listener for spacebar play toggle
 //?             Tidy up style.css including class and id names 
 
