@@ -53,6 +53,10 @@ input {
     background-color: white;
 }
 
+.value_h4 {
+    margin: 0px;
+}
+
 .spacer {
     height: 50px;
 }
@@ -120,6 +124,47 @@ input {
     background-color: white;
 }
 
+.settings_button_template {
+    width: 100px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 30px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2.5px solid #717171;
+    background-color: #e3e3e3;
+    display: flex;
+    justify-content: center;
+}
+
+.settings_slider_template {
+    -webkit-appearance: none;
+    height: 1vh;
+    width: 50vw;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 30px;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    background: #797979;
+}
+
+.settings_slider_template::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    /* background-color: rgb(39, 39, 39); */
+    background-color: rgb(196, 119, 32);
+    height: 5vh;
+    width: 2vh;    
+}
+
+.settings_colour_template {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 30px;
+}
+
 #settings_main_heading {
     display: flex;
     justify-content: center;
@@ -148,9 +193,6 @@ input {
 }
 
 #intensity_spectrum_box_custom_colour {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -161,19 +203,6 @@ input {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-}
-
-.settings_button_template {
-    width: 100px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-right: 30px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 2.5px solid #717171;
-    background-color: #e3e3e3;
-    display: flex;
-    justify-content: center;
 }
 
 #heatmap_colour {
@@ -198,11 +227,14 @@ input {
 }
 
 #waveform_box_custom_colour {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 20px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+#moving_average_window_width {
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
 }
 

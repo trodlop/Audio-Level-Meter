@@ -54,9 +54,9 @@
                 <div id="settings_option1_hidden_sub">
                     <div class="settings_option1_sub_settings" id="intensity_spectrum_settings">
                         <h2>Line Colour</h2>
-                        <div id="intensity_spectrum_line_colour">
-                                <input id="intensity_spectrum_box_custom_colour" type="color">
-                                <h4 id="intensity_spectrum_box_custom_colour_hex_code"></h4>
+                        <div class="settings_button_container_template" id="intensity_spectrum_line_colour">
+                                <input class="settings_colour_template" id="intensity_spectrum_box_custom_colour" type="color">
+                                <h4 class="value_h4" id="intensity_spectrum_box_custom_colour_hex_code"></h4>
                         </div>
                         
                         <h2>X Axis Scale</h2>
@@ -96,9 +96,9 @@
 
                     <div class="settings_option1_sub_settings" id="waveform_settings">
                         <h2>Line Colour</h2>
-                        <div id="waveform_line_colour">
-                                <input id="waveform_box_custom_colour" type="color">
-                                <h4 id="waveform_box_custom_colour_hex_code"></h4>
+                        <div class="settings_button_container_template" id="waveform_line_colour">
+                            <input class="settings_colour_template" id="waveform_box_custom_colour" type="color">
+                            <h4 class="value_h4" id="waveform_box_custom_colour_hex_code"></h4>
                         </div>
                     </div>
 
@@ -175,7 +175,7 @@
 
             <div class="settings_options_sub" id="settings_option4_sub">
                 <h2 class="settings_h2 prevent_select">DATA SMOOTHING</h2>
-                <h3 class="prevent_select" id="settings_h3_option4">raw</h3>
+                <h3 class="prevent_select" id="settings_h3_option4"></h3>
             </div>
 
             <div class="settings_options_hidden" id="settings_option4_hidden">
@@ -186,6 +186,31 @@
                 <div class="settings_option_container_template" id="settings_option4_button2_selector">
                     <div class="settings_options_button_template" id="settings_option4_button2"></div>
                     <p class="prevent_select">Savitzky-Golay Filter</p>
+                </div>
+                <div class="settings_option_container_template" id="settings_option4_button3_selector">
+                    <div class="settings_options_button_template" id="settings_option4_button3"></div>
+                    <p class="prevent_select">Moving Average</p>
+                </div>
+
+                <div id="settings_option4_hidden_sub">
+                    <div class="settings_option1_sub_settings" id="moving_average_settings">
+                        <h2>Window Width</h2>
+                        <div class="settings_button_container_template" id="moving_average_window_width">
+                            <input class="settings_slider_template" type="range" id="moving_average_window_width_slider" min="1" max="51" step="2" value="11">
+                            <h4 class="value_h4" id="moving_average_window_width_value"></h4>
+                        </div>
+                        
+                        <h2>Average Type</h2>
+                        <div class="settings_button_container_template" id="moving_average_type">
+                            <div class="settings_button_template" id="moving_average_mean">
+                                <p class="prevent_select">Mean</p>
+                            </div>
+                            <div class="settings_button_template" id="moving_average_median">
+                                <p class="prevent_select">Median</p>
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
             </div>
             
@@ -261,6 +286,8 @@
                 <p>This applies no smoothing to the data, keeping the data raw. Applying no smoothing to the data can help identify particularly high sound levels.</p>
                 <h4>Savitzky-Golay Filter</h4>
                 <p>A Savitzky-Golay Filter is a smoothing function used to smooth out anomalous data points, while still keeping the shape of the dataset. It makes it easier to see the general shape of the data, as it smoothes out the "bumpiness".</p>
+                <h4>Moving Average</h4>
+                <p>A moving average smoothing function functions the same as a Savitzky-Golay Filter, however replaces each value with the mean/median average of the values in a sliding window, resulting in a more aggressive smoothing of the data than a Savitzky-Golay Filter.</p>
 
                 <div class="spacer"></div>
 
@@ -270,7 +297,7 @@
 
     </main>
 
-    <p>Version 4.25 - a</p> <!-- a = visual update, b = functional update, c = feature update -->
+    <p>Version 5.10 - a</p> <!-- a = visual update, b = functional update, c = feature update -->
 
     <div class="spacer"></div>
     

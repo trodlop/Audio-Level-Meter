@@ -27,8 +27,20 @@ function initialise_settings() {
     if (localStorage.getItem("waveform_colour") === null) {
         localStorage.setItem("waveform_colour","#008EFF"); // "#008EFF" = cyan
     };
+    if (localStorage.getItem("softmax_axis") === null) {
+        localStorage.setItem("softmax_axis","linear"); // logarithmic, linear
+    };
+    if (localStorage.getItem("softmax_colour") === null) {
+        localStorage.setItem("softmax_colour","#008EFF"); // "#008EFF" = cyan 
+    };
     if (localStorage.getItem("data_smoothing") === null) {
-        localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay
+        localStorage.setItem("data_smoothing","raw"); // raw, savitzky-golay, moving average (mean), moving average (median)
+    };
+    if (localStorage.getItem("moving_average_window") === null || localStorage.getItem("moving_average_window") != 11) {
+        localStorage.setItem("moving_average_window",11); // 0 < int < Decibels.length
+    };
+    if (localStorage.getItem("download_type") === null) {
+        localStorage.setItem("download_type","simple"); // simple, full
     };
     console.log("Settings initialised");
 };
@@ -350,6 +362,10 @@ const option4_button1 = document.getElementById("settings_option4_button1");
 const option4_button2_container = document.getElementById("settings_option4_button2_selector");
 const option4_button2 = document.getElementById("settings_option4_button2");
 
+const option4_button3_container = document.getElementById("settings_option4_button3_selector");
+const option4_button3 = document.getElementById("settings_option4_button3");
+const option4_moving_average_settings = document.getElementById("moving_average_settings");
+
 // const option4_button3_container = document.getElementById("settings_option4_button3_selector");
 // const option4_button3 = document.getElementById("settings_option4_button3");
 
@@ -358,6 +374,9 @@ function option4_toggle_button(no) {
     
     option4_button1.style.backgroundColor = "white";
     option4_button2.style.backgroundColor = "white";
+    option4_button3.style.backgroundColor = "white";
+
+    option4_moving_average_settings.style.display = "none";
 
     if (no == 1) {
         option4_button1.style.backgroundColor = "orange";
@@ -366,11 +385,49 @@ function option4_toggle_button(no) {
     else if (no == 2) {
         option4_button2.style.backgroundColor = "orange";
         localStorage.setItem("data_smoothing", "savitzky-golay");
+    }
+    else if (no == 3) {
+        option4_button3.style.backgroundColor = "orange";
+        option4_moving_average_settings.style.display = "block";
+        localStorage.setItem("data_smoothing", "moving average (mean)");
     };
     update_previews();
 };
 option4_button1_container.onclick = function() { option4_toggle_button(1); };
 option4_button2_container.onclick = function() { option4_toggle_button(2); };
+option4_button3_container.onclick = function() { option4_toggle_button(3); };
+
+// Moving Average Settings
+
+const moving_average_window_width_slider = document.getElementById("moving_average_window_width_slider");
+moving_average_window_width_slider.addEventListener("input", function() {
+    localStorage.setItem("moving_average_window",moving_average_window_width_slider.value);
+    update_previews();
+});
+
+const moving_average_mean = document.getElementById("moving_average_mean");
+const moving_average_median = document.getElementById("moving_average_median");
+
+function moving_average_type(no) {
+    moving_average_mean.style.backgroundColor = "#e3e3e3";
+    moving_average_mean.style.borderColor = "#717171";
+    moving_average_median.style.backgroundColor = "#e3e3e3";
+    moving_average_median.style.borderColor = "#717171";
+
+    if (no == 1) {
+        moving_average_mean.style.backgroundColor = "#858585";
+        moving_average_mean.style.borderColor = "orange";
+        localStorage.setItem("data_smoothing","moving average (mean)");
+    }
+    else if (no == 2) {
+        moving_average_median.style.backgroundColor = "#858585";
+        moving_average_median.style.borderColor = "orange";
+        localStorage.setItem("data_smoothing","moving average (median)");
+    };
+    update_previews();
+};
+moving_average_mean.onclick = function() { moving_average_type(1); };
+moving_average_median.onclick = function() { moving_average_type(2); };
 
 // -------------------------------------------------------------------------------------
 
@@ -455,7 +512,25 @@ function update_previews() {
     }
     else if (localStorage.getItem("data_smoothing") == "savitzky-golay") {
         option4_button2.style.backgroundColor = "orange";
+    }
+    else if (localStorage.getItem("data_smoothing") == "moving average (mean)") {
+        option4_button3.style.backgroundColor = "orange";
+        option4_moving_average_settings.style.display = "block";
+        moving_average_mean.style.backgroundColor = "#858585";
+        moving_average_mean.style.borderColor = "orange";
+        moving_average_median.style.backgroundColor = "#e3e3e3";
+        moving_average_median.style.borderColor = "#717171";
+    }
+    else if (localStorage.getItem("data_smoothing") == "moving average (median)") {
+        option4_button3.style.backgroundColor = "orange";
+        option4_moving_average_settings.style.display = "block";
+        moving_average_median.style.backgroundColor = "#858585";
+        moving_average_median.style.borderColor = "orange";
+        moving_average_mean.style.backgroundColor = "#e3e3e3";
+        moving_average_mean.style.borderColor = "#717171";
     };
+
+    moving_average_window_width_value.innerText = localStorage.getItem("moving_average_window");
 
     if (localStorage.getItem("download_type") == "simple") {
         option5_button1.style.backgroundColor = "orange";
