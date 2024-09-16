@@ -1021,7 +1021,7 @@ function save_data_txt(dataset) {
         full_save_data.push(dataset);
     };
 
-    simple_save_data = [`Maximum: ${maximum}dB`,`Minimum: ${minimum}dB`,`Peak: ${peak}dB`,`LEQ: ${leq}dB`,`Runtime: ${runtime}ms`,`Calibration: ${calibration_display.innerText}dB`,`Frequency Weighting: ${localStorage.getItem("weighting")}`,`Data Smoothing: ${localStorage.getItem("data_smoothing")}`,"",];
+    simple_save_data = [`Maximum: ${maximum}dB`,`Minimum: ${minimum}dB`,`Peak: ${peak}dB`,`LEQ: ${leq}dBA`,`Runtime: ${runtime}ms`,`Calibration: ${calibration_display.innerText}dB`,`Frequency Weighting: ${localStorage.getItem("weighting")}`,`Data Smoothing: ${localStorage.getItem("data_smoothing")}`,"",];
 };
 
 const download_button = document.getElementById("download");
