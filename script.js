@@ -623,7 +623,7 @@ function capture_audio_data() {
     // Get the frequency data from the analyser
     if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
         analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
-        Decibels = Data.map(value => value + 120 + calibration); // Adjust the data and save in Decibels Array
+        Decibels = Data.map(value => value + 120 + calibration); // Adjust the data and save in Decibels Array        
         // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
     }
     else if (visualiser_type == "waveform") {
