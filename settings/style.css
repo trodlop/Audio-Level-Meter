@@ -238,8 +238,14 @@ input {
     align-items: center;
 }
 
-#settings_h3_option_glossary {
+.settings_h3_option_hidden {
     opacity: 0%;
+}
+
+#github_link {
+    text-decoration: none;
+    color: blue;
+    font-weight: bold;
 }
 
 @media (max-width: 800px) {

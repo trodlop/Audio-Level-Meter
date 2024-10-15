@@ -69,6 +69,9 @@ const option5_preview = document.getElementById("settings_h3_option5");
 const option_glossary = document.getElementById("settings_option_glossary_sub");
 const option_glossary_hidden = document.getElementById("settings_option_glossary_hidden");
 
+const option_faq = document.getElementById("settings_option_faq_sub");
+const option_faq_hidden = document.getElementById("settings_option_faq_hidden");
+
 // Functions to toggle between different settings options
 function toggle_options(no) {
     option1_hidden.style.display = "none";
@@ -77,6 +80,7 @@ function toggle_options(no) {
     option4_hidden.style.display = "none";
     option5_hidden.style.display = "none";
     option_glossary_hidden.style.display = "none";
+    option_faq_hidden.style.display = "none";
 
     if (no == 1) {
         option1_hidden.style.display = "block";
@@ -95,6 +99,9 @@ function toggle_options(no) {
     }
     else if (no == "glossary") {
         option_glossary_hidden.style.display = "block";
+    }
+    else if (no == "faq") {
+        option_faq_hidden.style.display = "block";
     };
 };
 option1.onclick = function() { toggle_options(1); };
@@ -103,6 +110,7 @@ option3.onclick = function() { toggle_options(3); };
 option4.onclick = function() { toggle_options(4); };
 option5.onclick = function() { toggle_options(5); };
 option_glossary.onclick = function() { toggle_options("glossary"); };
+option_faq.onclick = function() { toggle_options("faq"); };
 
 // -------------------------------------------------------------------------------------
 

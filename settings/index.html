@@ -248,7 +248,7 @@
 
             <div class="settings_options_sub" id="settings_option_glossary_sub">
                 <h2 class="settings_h2 prevent_select">GLOSSARY</h2>
-                <h3 class="prevent_select" id="settings_h3_option_glossary">descriptions</h3>
+                <h3 class="prevent_select settings_h3_option_hidden">descriptions</h3>
             </div>
 
             <div class="settings_options_hidden" id="settings_option_glossary_hidden">
@@ -301,10 +301,56 @@
                 <h4>Moving Average</h4>
                 <p>A moving average smoothing function functions the same as a Savitzky-Golay Filter, however replaces each value with the mean/median average of the values in a sliding window, resulting in a more aggressive smoothing of the data than a Savitzky-Golay Filter.</p>
 
+                <h2>Data Download Type</h2>
+                <p>This specifies what audio data you want to download from the recorded interval. The downloaded data is as a .txt file.</p>
+                <h4>Simplified</h4>
+                <p>This will only download the min, max, peak, etc. data, as well as the different calibration, frequency weighting and data smoothing settings that were selected.</p>
+                <h4>Full</h4>
+                <p>This will download all of the same data as simplified, however, also downloads the full captured audio data for that recorded interval. The downloaded audio data is in the form of a 512 long float32Array for each time interval (100ms). Each array contains the decibel levels for each frequency interval (in the form: Float32Array(512) [Float32, Float32, Float32, ...).</p>
+
                 <div class="spacer"></div>
 
             </div>
             
+        </div>
+
+        <div class="settings_options_separator">
+            <div class="settings_options_separator_sub"></div>
+        </div>
+
+        <div class="settings_options_template" id="settings_option_faq">
+
+            <div class="settings_options_sub" id="settings_option_faq_sub">
+                <h2 class="settings_h2 prevent_select">FAQ</h2>
+                <h3 class="prevent_select settings_h3_option_hidden" id="settings_h3_option_faq">faq</h3>
+            </div>
+
+            <div class="settings_options_hidden" id="settings_option_faq_hidden">
+
+                <h4>Is this audio level meter free?</h4>
+                <p>Yes. The audio level meter is completely free to use, and does not have any additional features hidden behind a paywall. The aim of this project is to provide a high quality audio level meter completely free for people to use.</p>
+                <h4>Does this audio level meter collect any personal information?</h4>
+                <p>The audio level meter does not collect, use or save any personal information. The only data/information the website may use regards the system's microphone as it is needed to capture audio data for the meter.</p>
+                <h4>Can I use this audio level meter professionally or for non-recreational purposes?</h4>
+                <p>This audio level meter aims to be as high quality as possible, and includes any useful features which makes it very versatile. However, I do not recommend ONLY using this audio level meter to monitor audio levels. Even if you are using a prossessional microphone to capture the audio, you will still have to calibrate the meter against a control. For this reason I would recommend using this meter in conjunction with another control meter, to make sure the meter is accurate.</p>
+                <h4>Does the meter require any specific hardware (any particular microphones or audio capturing hardware) to function properly?</h4>
+                <p>The audio level meter will work with any microphone (including in-built phone or laptop microphone as well as external microphones), however, the quality of the microphone will affect accuracy of the displayed audio data. If you are using a lower quality microphone, you may try to edit the filter settings to counteract the microphone's frequency response.</p>
+                <h4>How can I choose between microphones if I have multiple connected?</h4>
+                <p>Currently there is no option to select between microphones, however this feature will get added in the near future. On computers the microphone used for the meter is the system default microphone (this can be changed in the computer's settings). If this does not work or you are using a phone, for now, just have the microphone you want to use be the only one plugged in.</p>
+                <h4>How often does this audio level meter get updated?</h4>
+                <p>Depending on what needs to be added or fixed, updates may vary in frequency. However, I try to maintain the website as much as possible.</p>
+                <h4>How can I report any bugs I find?</h4>
+                <p>There is currently no in-built way of reporting any bugs found, however, you can drop me an email with any information regarding the bug: trodlop2004@gmail.com</p>
+                <h4>Will this audio level meter ever be turned into an application?</h4>
+                <p>While I am not currently working on turning this meter into an app, I do have plans to make it into a Windows desktop application. For the time being, I have no plans of turning it into a phone application.</p>
+
+                <h4>Note:</h4>
+                <p>This audio level meter is open source and the source code may be reviewed on my GitHub: <a id="github_link" href="https://github.com/trodlop/Audio-Level-Meter">https://github.com/trodlop/Audio-Level-Meter</a>. Feel free to download and edit the code however you like.</p>
+
+                <div class="spacer"></div>
+
+            </div>
+
         </div>
 
     </main>
