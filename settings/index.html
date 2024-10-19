@@ -8,7 +8,7 @@
     <title>Settings</title>
     <link rel="icon" type="image/x-icon" href="../icons/favicon.svg">
 
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
@@ -25,7 +25,7 @@
 
     <main id="settings_main_options">
 
-        <div class="settings_options_template" id="settings_option1">
+        <div class="settings_options_template" id="settings_option1"> <!-- VISUALISER -->
 
             <div class="settings_options_sub" id="settings_option1_sub">
                 <h2 class="settings_h2 prevent_select">VISUALISER</h2>
@@ -104,6 +104,8 @@
 
                     <div class="settings_option1_sub_settings" id="softmax_settings">
 
+                        <!-- NEEDS TO BE DONE! -->
+
                     </div>
                 </div>
 
@@ -115,7 +117,7 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option2">
+        <div class="settings_options_template" id="settings_option2"> <!-- FREQUENCY WEIGHTING -->
 
             <div class="settings_options_sub" id="settings_option2_sub">
                 <h2 class="settings_h2 prevent_select">FREQUENCY WEIGHTING</h2>
@@ -147,7 +149,7 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option3">
+        <div class="settings_options_template" id="settings_option3"> <!-- SOUND LEVEL DISPLAY -->
 
             <div class="settings_options_sub" id="settings_option3_sub">
                 <h2 class="settings_h2 prevent_select">SOUND LEVEL DISPLAY</h2>
@@ -171,7 +173,7 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option4">
+        <div class="settings_options_template" id="settings_option4"> <!-- DATA SMOOTHING -->
 
             <div class="settings_options_sub" id="settings_option4_sub">
                 <h2 class="settings_h2 prevent_select">DATA SMOOTHING</h2>
@@ -220,10 +222,10 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option5">
+        <div class="settings_options_template" id="settings_option5"> <!-- DATA DOWNLOAD -->
 
             <div class="settings_options_sub" id="settings_option5_sub">
-                <h2 class="settings_h2 prevent_select">DATA DOWNLOAD TYPE</h2>
+                <h2 class="settings_h2 prevent_select">DATA DOWNLOAD</h2>
                 <h3 class="prevent_select" id="settings_h3_option5">simple</h3>
             </div>
 
@@ -244,7 +246,178 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option_glossary">
+        <div class="settings_options_template" id="settings_option_custom_filter"> <!-- CUSTOM FILTER -->
+
+            <div class="settings_options_sub" id="settings_option_custom_filter_sub">
+                <h2 class="settings_h2 prevent_select">CUSTOM FILTER/FREQUENCY RESPONSE</h2>
+                <h3 class="prevent_select settings_h3_option_hidden">descriptions</h3>
+            </div>
+
+            <div class="settings_options_hidden" id="settings_option_custom_filter_hidden">
+
+                <div id="custom_frequency_visualiser_container">
+                    <canvas id="custom_frequency_visualiser" width="1920" height="1080"></canvas>
+                </div>
+
+                <div id="custom_frequency_values_grid">
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">100</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">133</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">176</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">234</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">311</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">414</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">550</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">730</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">969</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">1288</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">1711</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">2274</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">3020</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">4012</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">5330</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">7080</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">9406</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">12495</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">16599</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2">22050</h2>
+                    </div>
+
+
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_0">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_1">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_2">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_3">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_4">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_5">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_6">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_7">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_8">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_9">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_10">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_11">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_12">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_13">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_14">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_15">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_16">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_17">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_18">0</h2>
+                    </div>
+                    <div class="custom_frequency_values_grid_template">
+                        <h2 class="custom_frequency_values_h2" id="custom_frequency_value_19">0</h2>
+                    </div>
+                </div>
+
+                <div class="settings_button_container_template" id="custom_filter_controls">
+                    <div class="settings_button_template" id="custom_filter_new">
+                        <p class="prevent_select">NEW</p>
+                    </div>
+                    <div class="settings_button_template" id="custom_filter_save">
+                        <p class="prevent_select">SAVE</p>
+                    </div>
+                    <input id="custom_filter_input_new_name" type="text">
+                </div>
+
+                <div>
+                    <div class="center_h flex_space_between">
+                        <h2>Saved Filters</h2>
+                        <div class="center_v">
+                            <img src="" alt="OPEN">
+                            <img src="" alt="DELETE">
+                        </div>
+                    </div>
+                    
+                    <div id="saved_filters_list">
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+            </div>
+
+        </div>
+
+        <div class="settings_options_separator">
+            <div class="settings_options_separator_sub"></div>
+        </div>
+
+        <div class="settings_options_template" id="settings_option_glossary"> <!-- GLOSSARY -->
 
             <div class="settings_options_sub" id="settings_option_glossary_sub">
                 <h2 class="settings_h2 prevent_select">GLOSSARY</h2>
@@ -293,20 +466,20 @@
                 <p>Calculates the mean average sound level recorded in that instant. It more accurately reflects the true sound level recorded over time.</p>
 
                 <h2>Data Smoothing</h2>
-                <p>Smoothing functions are used to smooth out the recorded sound data. Different smoothing functions can be used to achieve different results, for example, to smooth out anomalous peaks and troughs, while still keeping the genaral shape of the dataset.</p>
+                <p>Smoothing functions are used to smooth out the recorded sound data. Different smoothing functions can be used to achieve different results, for example, to smooth out anomalous peaks and troughs, while still keeping the genaral shape of the dataset. Note that smoothing functions tend to be quite computationally intensive requiring many calculations, and can thus slow the performance of the audio level meter, especially if using an older device.</p>
                 <h4>Raw (no smoothing)</h4>
                 <p>This applies no smoothing to the data, keeping the data raw. Applying no smoothing to the data can help identify particularly high sound levels.</p>
                 <h4>Savitzky-Golay Filter</h4>
                 <p>A Savitzky-Golay Filter is a smoothing function used to smooth out anomalous data points, while still keeping the shape of the dataset. It makes it easier to see the general shape of the data, as it smoothes out the "bumpiness".</p>
                 <h4>Moving Average</h4>
-                <p>A moving average smoothing function functions the same as a Savitzky-Golay Filter, however replaces each value with the mean/median average of the values in a sliding window, resulting in a more aggressive smoothing of the data than a Savitzky-Golay Filter.</p>
+                <p>A moving average smoothing function functions the same as a Savitzky-Golay Filter, however replaces each value with the mean/median average of the values in a sliding window, resulting in a more aggressive smoothing of the data than a Savitzky-Golay Filter, but being less computationally intensive.</p>
 
                 <h2>Data Download Type</h2>
                 <p>This specifies what audio data you want to download from the recorded interval. The downloaded data is as a .txt file.</p>
                 <h4>Simplified</h4>
                 <p>This will only download the min, max, peak, etc. data, as well as the different calibration, frequency weighting and data smoothing settings that were selected.</p>
                 <h4>Full</h4>
-                <p>This will download all of the same data as simplified, however, also downloads the full captured audio data for that recorded interval. The downloaded audio data is in the form of a 512 long float32Array for each time interval (100ms). Each array contains the decibel levels for each frequency interval (in the form: Float32Array(512) [Float32, Float32, Float32, ...]).</p>
+                <p>This will download all of the same data as simplified, however, also downloads the full captured audio data for that recorded interval. The downloaded audio data is in the form of a 512 long float32Array for each time interval (100ms). Each array contains the decibel levels for each frequency interval (in the form: Float32Array(512) [Float32, Float32, Float32, ...).</p>
 
                 <div class="spacer"></div>
 
@@ -318,7 +491,7 @@
             <div class="settings_options_separator_sub"></div>
         </div>
 
-        <div class="settings_options_template" id="settings_option_faq">
+        <div class="settings_options_template" id="settings_option_faq"> <!-- FAQ -->
 
             <div class="settings_options_sub" id="settings_option_faq_sub">
                 <h2 class="settings_h2 prevent_select">FAQ</h2>
@@ -355,7 +528,7 @@
 
     </main>
 
-    <p>Version 5.20 - a</p> <!-- a = visual update, b = functional update, c = feature update -->
+    <p>Version 6.10 - beta test</p> <!-- a = visual update, b = functional update, c = feature update -->
 
     <div class="spacer"></div>
     

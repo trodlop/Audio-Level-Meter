@@ -66,12 +66,16 @@ const option5 = document.getElementById("settings_option5_sub");
 const option5_hidden = document.getElementById("settings_option5_hidden");
 const option5_preview = document.getElementById("settings_h3_option5");
 
+const option_custom_filter = document.getElementById("settings_option_custom_filter_sub");
+const option_custom_filter_hidden = document.getElementById("settings_option_custom_filter_hidden");
+
 const option_glossary = document.getElementById("settings_option_glossary_sub");
 const option_glossary_hidden = document.getElementById("settings_option_glossary_hidden");
 
 const option_faq = document.getElementById("settings_option_faq_sub");
 const option_faq_hidden = document.getElementById("settings_option_faq_hidden");
 
+let last_selected = null; // Variable to remember the last selected option
 // Functions to toggle between different settings options
 function toggle_options(no) {
     option1_hidden.style.display = "none";
@@ -79,8 +83,18 @@ function toggle_options(no) {
     option3_hidden.style.display = "none";
     option4_hidden.style.display = "none";
     option5_hidden.style.display = "none";
+    option_custom_filter_hidden.style.display = "none";
     option_glossary_hidden.style.display = "none";
     option_faq_hidden.style.display = "none";
+
+    // If the same option is clicked again, collapse it
+    if (last_selected === no) {
+        last_selected = null; // Reset last selected option
+        return; // End function here
+    };
+
+    // Show the selected option and remember it
+    last_selected = no;
 
     if (no == 1) {
         option1_hidden.style.display = "block";
@@ -97,6 +111,9 @@ function toggle_options(no) {
     else if (no == 5) {
         option5_hidden.style.display = "block";
     }
+    else if (no == "custom_filter") {
+        option_custom_filter_hidden.style.display = "block";
+    }
     else if (no == "glossary") {
         option_glossary_hidden.style.display = "block";
     }
@@ -109,6 +126,7 @@ option2.onclick = function() { toggle_options(2); };
 option3.onclick = function() { toggle_options(3); };
 option4.onclick = function() { toggle_options(4); };
 option5.onclick = function() { toggle_options(5); };
+option_custom_filter.onclick = function() { toggle_options("custom_filter"); };
 option_glossary.onclick = function() { toggle_options("glossary"); };
 option_faq.onclick = function() { toggle_options("faq"); };
 
@@ -469,6 +487,285 @@ option5_button1_container.onclick = function() { option5_toggle_button(1); };
 option5_button2_container.onclick = function() { option5_toggle_button(2); };
 
 // -------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+//! THIS SHIT IS A MESS BUT IT'S MY MESS :)
+// Code block for drawing filter graph (I cried 4 times writing this)
+function throttle(func, delay) { // Throttles the refresh of the mousemove event
+    let lastCall = 0;
+    return function(...args) {
+        const now = new Date().getTime();
+        if (now - lastCall >= delay) {
+            lastCall = now;
+            return func(...args);
+        };
+    };
+};
+
+var y_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+const canvas = document.getElementById("custom_frequency_visualiser"); // Accesses canvas element in html
+var ctx = canvas.getContext('2d'); // Creates a context to be able to draw on the canvas
+
+// Custom plugin to handle dragging points up and down
+const dragPlugin = {
+    id: 'dragPlugin',
+    afterEvent: throttle(function(chart, args) {
+        const event = args.event;
+        const dataset = chart.data.datasets[0];
+
+        if (event.type === "mousedown") {
+            chart.draggingPoint = getElementAtEvent(chart, event);
+            
+        } else if (event.type === 'mousemove' && chart.draggingPoint) {
+            // Get the index of the point being dragged
+            const index = chart.draggingPoint.index;
+
+            // Calculate the new Y value based on mouse position (rounded to nearest integer)
+            const newValue = Math.round(chart.scales.y.getValueForPixel(event.y));
+
+            // Update the y-value of the point being dragged (constrain to y axis range)
+            dataset.data[index] = Math.max(chart.scales.y.min, Math.min(chart.scales.y.max, newValue));
+
+            chart.update();
+
+        } else if (event.type === 'mouseup' || event.type === 'mouseout') {
+            if (chart.draggingPoint) {
+                // Save the updated y-values after dragging
+                y_values[chart.draggingPoint.index] = dataset.data[chart.draggingPoint.index];
+
+                // Clear dragging point
+                chart.draggingPoint = null;
+
+                update_custom_frequency_grid(y_values);
+            };
+        }
+    }, 50)  // Throttle function to limit updates to every 50ms rather infinately (avoids callstack error)
+};
+
+function getElementAtEvent(chart, event) {
+    const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+    return points.length ? points[0] : null;
+};
+
+Chart.defaults.animation = false; // Makes sure that graph refreshes instantly
+var visualiser = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [100, 133, 176, 234, 311, 414, 550, 730, 969, 1288, 1711, 2274, 3020, 4012, 5330, 7080, 9406, 12495, 16599, 22050],
+        datasets: [{
+            label: 'Data Points',
+            data: y_values,
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            borderColor: "#0060FF",
+            borderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#0060FF',
+            fill: true
+        }]
+    },
+    options: {
+        events: ['mousedown', 'mousemove', 'mouseup', 'click', 'touchstart', 'touchmove'], // Allows detection of mouse events
+        interaction: {
+            mode: 'nearest',
+        },
+        maintainAspectRatio: false,
+        plugins: {
+            dragPlugin: true,
+            tooltip: {
+                enabled: false
+            },
+            legend: {
+                display: false,
+            },
+        },
+        scales: {
+            x: {
+                type: "logarithmic",
+                position: 'bottom',
+                ticks: {
+                    callback: function(value, index, values) { // Displays X axis labels from custom pushed ticks
+
+                        const customLabels = {
+                            100: '100',
+                            500: '500',
+                            1000: '1k',
+                            2000: '2k',
+                            4000: '4k',
+                            8000: '8k',
+                            16000: '16k'
+                        };
+
+                        return customLabels[value] || '';
+                    },
+                },
+                afterBuildTicks: function(axis) {
+
+                    // Clear all pregenerated ticks
+                    axis.ticks = [];
+
+                    // Manually push only wanted ticks (essentially the vertical grid lines):                        
+
+                    // Iterate over the array and add ticks
+                    
+                    const tickValues = [
+                        { value: 100, major: true },
+                        { value: 200, major: false },
+                        { value: 300, major: false },
+                        { value: 400, major: false },
+                        { value: 500, major: true },
+                        { value: 600, major: false },
+                        { value: 700, major: false },
+                        { value: 800, major: false },
+                        { value: 900, major: false },
+                        { value: 1000, major: true },
+                        { value: 2000, major: true },
+                        { value: 3000, major: false },
+                        { value: 4000, major: true },
+                        { value: 5000, major: false },
+                        { value: 6000, major: false },
+                        { value: 7000, major: false },
+                        { value: 8000, major: true },
+                        { value: 9000, major: false },
+                        { value: 10000, major: false },
+                        { value: 16000, major: true },
+                        { value: 20000, major: false }
+                    ];
+                    for (let i = 0; i < tickValues.length; i++) {
+                        axis.ticks.push({
+                            value: tickValues[i].value,
+                            major: tickValues[i].major,
+                        });
+                    };
+                },
+
+                
+                min: 100, // Set the minimum value for the x-axis
+                max: 22050, // Set the maximum value for the x-axis
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.3)',
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    lineWidth: 1
+                },
+                title: {
+                    display: false,
+                }
+            },
+            y: {
+                min: -40,    // Minimum value of the Y-axis
+                max: 40,    // Maximum value of the Y-axis
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.5)', // Adjust the color and opacity
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    lineWidth: 2
+                },
+                title: {
+                    display: false,
+                }
+            }
+        }
+    },
+    plugins: [dragPlugin] // Adding the drag plugin outside the 'plugins' options
+});
+
+function update_custom_frequency_grid(array) { //Updates custom frequency intervals grid
+    for (let i = 0; i < array.length; i++) {
+        document.getElementById(`custom_frequency_value_${i}`).innerText = array[i];
+    };
+};
+
+
+
+// Function to search for local storage key substrings and add them to an object
+let div_object = {};
+function retrieve_saved_filters_to_object() {
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);  // Get the key at index i
+
+        // Check if the key contains the specified substring
+        if (key.includes("custom_filter_")) {
+            div_object[key] = JSON.parse(localStorage.getItem(key));  // Append the matching key to the array
+        };
+    };
+    console.log(div_object);
+};
+retrieve_saved_filters_to_object(); // Run function on page load
+
+// Function to create a new child element for a new saved filter
+const custom_filter_save = document.getElementById("custom_filter_save");
+function create_custom_filter_div() {
+    // Get the value from the input
+    const filter_name = document.getElementById("custom_filter_input_new_name").value;
+
+    if (filter_name.trim() === "") { // Alert if filter is not given a name
+        alert("Please enter a name for the filter");
+        return;
+    };
+
+    // Create a new div using the template structure
+    const new_filter_div = document.createElement("div");
+    new_filter_div.classList.add("template_custom_user_filter_container", "center_h", "prevent_select");
+    new_filter_div.id = `custom_filter_${filter_name}`;
+    div_object[`custom_filter_${filter_name}`] = false;
+    console.log(div_object);
+    
+
+    // Create an h3 element for the filter name
+    const filter_name_element = document.createElement("h3");
+    filter_name_element.classList.add("template_custom_user_filter_name");
+    filter_name_element.textContent = filter_name; // Set the text to the input value
+
+    // Add the h3 element to the div
+    new_filter_div.appendChild(filter_name_element);
+
+    // Add the new filter div to the saved_filters_list container
+    document.getElementById("saved_filters_list").appendChild(new_filter_div);
+
+    // Clear the input field
+    document.getElementById("custom_filter_input_new_name").value = "";
+};
+
+// Function to save filter arrays in local storage
+function save_filter_local_storage(name, array) {
+    if (localStorage.getItem(`custom_filter_${name}`) === null) { // Checks to see if a filter with that name doesn't already exist
+        localStorage.setItem(`custom_filter_${name}`, JSON.stringify(array));
+        create_custom_filter_div();
+    }
+    else {
+        alert("There already exists a filter with that name");
+    };
+};
+custom_filter_save.onclick = function() {
+    save_filter_local_storage(document.getElementById("custom_filter_input_new_name").value, y_values); 
+};
+
+
+function open_custom_filter(filter_name) {
+    let array = JSON.parse(localStorage.getItem(filter_name));
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Update selected options preview (NOTE: needs to be last such that toggle variables have already been declared)
 function update_previews() {

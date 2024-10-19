@@ -53,6 +53,25 @@ input {
     background-color: white;
 }
 
+input[type=text] {
+    border: solid 5px black;
+}
+
+.center_h {
+    display: flex;
+    align-items: center;
+}
+
+.center_v {
+    display: flex;
+    justify-content: center;
+}
+
+.flex_space_between {
+    display: flex;
+    justify-content: space-between;
+}
+
 .value_h4 {
     margin: 0px;
 }
@@ -246,6 +265,61 @@ input {
     text-decoration: none;
     color: blue;
     font-weight: bold;
+}
+
+.template_custom_user_filter_container {
+    height: 30px;
+    background-color: #c9c9c9;
+}
+
+.template_custom_user_filter_container:hover {
+    background-color: #797979;
+}
+
+.template_custom_user_filter_name {
+    margin-left: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: black;
+}
+
+#custom_frequency_visualiser_container {
+    position: relative;
+    left: -2.5vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    width: 90vw;
+}
+
+#custom_frequency_visualiser {
+    height: 60vh;
+    width: 90vw;
+    margin: 20px;
+    margin-right: 40px;
+    /* border: solid 5px black; */
+}
+
+#custom_frequency_values_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 30px 30px;
+    column-gap: 2px;
+    row-gap: 2px;
+    background-color: black;
+}
+
+.custom_frequency_values_grid_template {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.custom_frequency_values_h2 {
+    font-size: 12px;
 }
 
 @media (max-width: 800px) {
