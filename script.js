@@ -51,7 +51,7 @@ function initialise_settings() {
         localStorage.setItem("download_type","simple"); // simple, full
     };
     if (localStorage.getItem("frequency_response") === null) {
-        localStorage.setItem("frequency_response","none"); // simple, full
+        localStorage.setItem("frequency_response",JSON.stringify([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])); // simple, full
     };
     console.log("Settings initialised");
 };
@@ -1122,14 +1122,13 @@ calibrationSlider.addEventListener("input", function() {
 //                                  spectrogram colours
 //                                  spectrogram refresh rate
 //                                  waveform line colour
-//TODO                              softmax line colour
-//TODO                              softmax settings (linear axis or logarithmic, bar or line)
+//TODO                              minmax line colour
 //                                  intensity spectrum data visualisation type (raw or smoothed + different types of smoothing)
 //                                  moving average smoothing window size (smaller = less smoothing, wider = more smoothing)
 //                                  download type (simple, full)
 
 //              Add smoothing function to Decibels array (add more smoothing options)
-//TODO          Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
+//              Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
 //              Add Spectrogram visualisation
 //              Add Waveform visualisation
 //              Add softmax visualisation
