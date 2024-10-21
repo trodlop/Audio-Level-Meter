@@ -50,6 +50,9 @@ function initialise_settings() {
     if (localStorage.getItem("download_type") === null) {
         localStorage.setItem("download_type","simple"); // simple, full
     };
+    if (localStorage.getItem("frequency_response") === null) {
+        localStorage.setItem("frequency_response","none"); // simple, full
+    };
     console.log("Settings initialised");
 };
 initialise_settings();
@@ -81,6 +84,40 @@ const smoothing = localStorage.getItem("data_smoothing"); // "raw" = no smoothin
 const refresh_interval = localStorage.getItem("time_interval");
 const spectrogram_refresh = localStorage.getItem("spectrogram_refresh");
 const spectrogram_colour = localStorage.getItem("spectrogram_colour");
+
+function get_frequency_response() {
+
+    const array_indexes = [0, 2, 3, 4, 6, 9, 12, 16, 22, 29, 39, 52, 69, 92, 123, 163, 217, 289, 384, 511]; // The indexes where the frequency response array frequency intervals align to the main 512 long array
+
+    if (localStorage.getItem("frequency_response") == "none") { // If there is no selected frequency response just return array of 0s (applies no filter)
+        return [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ]
+    };
+
+    const array = JSON.parse(localStorage.getItem("frequency_response")); // If there is a selected requency response, extrapolate data and return array of filter weightings
+    let extrapolated_array = [];    
+
+    for (let i = 0; i < array_indexes.length - 1; i++) { // Extrapolates frequency_response array so that it is 512 long
+
+        let a = array_indexes[i];
+        let b = array_indexes[i + 1];
+        let n = b - a;
+
+        a = array[i];
+        b = array[i + 1];
+
+        let step = (b - a) / (n);        
+
+        for (let i = 0; i < n; i++) {
+            extrapolated_array.push(a + ((i) * step));
+        };
+    };
+    extrapolated_array.push(array[19]); // Pushes the last value in the array
+
+    return (extrapolated_array);
+};
+const frequency_response = get_frequency_response();
 
 document.getElementById('refresh').addEventListener('click', function() {
     location.reload();
@@ -635,7 +672,7 @@ function capture_audio_data() {
         // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
     };
 
-    apply_weighting(); // Applies any weighting selected
+    apply_weighting(); // Applies any weighting selected and frequency response
     apply_smoothing(); // Applies any smoothing function selected
     calc_min_max_peak_leq(Decibels); // Updates/calculates new min, max, peak and leq
 
@@ -811,7 +848,10 @@ function apply_weighting() {
             // C weighting to be added
         } 
         // else if { apply 'zero' weighting }
-    };     
+
+        array = Decibels
+        Decibels = array.map((value, index) => value + frequency_response[index]); // Applies frequency response to Decibels array
+    };
 };
 
 // Applies smoothing function to the Decibels array (raw, savitzky-golay)
