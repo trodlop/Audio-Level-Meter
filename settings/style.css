@@ -270,17 +270,40 @@ input[type=text] {
 .template_custom_user_filter_container {
     height: 30px;
     background-color: #c9c9c9;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
-.template_custom_user_filter_container:hover {
-    background-color: #797979;
+.saved_filters_buttons {
+    height: 25px;
+    width: 25px;
+    padding-left: 15px;
 }
+
+#saved_filters_list .template_custom_user_filter_container {
+    border-bottom: 2px solid black; 
+}
+
+#saved_filters_list .template_custom_user_filter_container:last-child {
+    border-bottom: none; 
+}
+
+/* .template_custom_user_filter_container:hover {
+    background-color: #aaaaaa;
+} */
 
 .template_custom_user_filter_name {
-    margin-left: 10px;
+    margin-left: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    color: black;
+}
+
+.template_custom_user_filter_array {
+    margin-right: 20px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
-    color: black;
+    color: rgb(73, 73, 73);
 }
 
 #custom_frequency_visualiser_container {
@@ -322,9 +345,33 @@ input[type=text] {
     font-size: 12px;
 }
 
+#unavailable_feature {
+    display: none;
+}
+
 @media (max-width: 800px) {
     #heatmap_colour {
         display: grid;
         grid-template-columns: repeat(auto-fill, 150px);
+    }
+
+    #unavailable_feature {
+        display: block;
+    }
+
+    #custom_frequency_visualiser_container {
+        display: none;
+    }
+    
+    #custom_frequency_values_grid {
+        display: none;
+    }
+    
+    #custom_filter_controls {
+        display: none;
+    }
+    
+    #saved_filters_container {
+        display: none;
     }
 }

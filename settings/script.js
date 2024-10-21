@@ -42,6 +42,9 @@ function initialise_settings() {
     if (localStorage.getItem("download_type") === null) {
         localStorage.setItem("download_type","simple"); // simple, full
     };
+    if (localStorage.getItem("frequency_response") === null) {
+        localStorage.setItem("frequency_response", "none");
+    };
     console.log("Settings initialised");
 };
 initialise_settings();
@@ -488,12 +491,6 @@ option5_button2_container.onclick = function() { option5_toggle_button(2); };
 
 // -------------------------------------------------------------------------------------
 
-
-
-
-
-
-
 //! THIS SHIT IS A MESS BUT IT'S MY MESS :)
 // Code block for drawing filter graph (I cried 4 times writing this)
 function throttle(func, delay) { // Throttles the refresh of the mousemove event
@@ -507,7 +504,8 @@ function throttle(func, delay) { // Throttles the refresh of the mousemove event
     };
 };
 
-var y_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+// var y_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var y_values = JSON.parse(localStorage.getItem("frequency_response"));
 
 const canvas = document.getElementById("custom_frequency_visualiser"); // Accesses canvas element in html
 var ctx = canvas.getContext('2d'); // Creates a context to be able to draw on the canvas
@@ -676,55 +674,61 @@ var visualiser = new Chart(ctx, {
     plugins: [dragPlugin] // Adding the drag plugin outside the 'plugins' options
 });
 
+function set_active_frequency_response(array) {
+    localStorage.setItem("frequency_response",JSON.stringify(array))
+};
+
 function update_custom_frequency_grid(array) { //Updates custom frequency intervals grid
     for (let i = 0; i < array.length; i++) {
         document.getElementById(`custom_frequency_value_${i}`).innerText = array[i];
     };
+    set_active_frequency_response(array);
 };
-
-
+update_custom_frequency_grid(y_values); // Initialises the grid on page load
 
 // Function to search for local storage key substrings and add them to an object
-let div_object = {};
+let clicked_object = {}; // Object to store whether a filter is clicked
 function retrieve_saved_filters_to_object() {
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);  // Get the key at index i
 
         // Check if the key contains the specified substring
         if (key.includes("custom_filter_")) {
-            div_object[key] = JSON.parse(localStorage.getItem(key));  // Append the matching key to the array
+            clicked_object[key] = false; // Set clicked to false
         };
     };
-    console.log(div_object);
 };
 retrieve_saved_filters_to_object(); // Run function on page load
 
 // Function to create a new child element for a new saved filter
 const custom_filter_save = document.getElementById("custom_filter_save");
-function create_custom_filter_div() {
-    // Get the value from the input
-    const filter_name = document.getElementById("custom_filter_input_new_name").value;
+function create_custom_filter_div(name, key) {
 
-    if (filter_name.trim() === "") { // Alert if filter is not given a name
-        alert("Please enter a name for the filter");
-        return;
+    if (document.getElementById(`custom_filter_${name}`)) { // Exit the function to avoid creating a duplicate div
+        return; 
     };
 
     // Create a new div using the template structure
     const new_filter_div = document.createElement("div");
-    new_filter_div.classList.add("template_custom_user_filter_container", "center_h", "prevent_select");
-    new_filter_div.id = `custom_filter_${filter_name}`;
-    div_object[`custom_filter_${filter_name}`] = false;
-    console.log(div_object);
+    new_filter_div.classList.add("template_custom_user_filter_container", "center_h", "flex_space_between", "prevent_select");
+    new_filter_div.id = `custom_filter_${name}`;
+    // div_object[`custom_filter_${name}`] = false;
+    // console.log(div_object);
     
 
     // Create an h3 element for the filter name
     const filter_name_element = document.createElement("h3");
     filter_name_element.classList.add("template_custom_user_filter_name");
-    filter_name_element.textContent = filter_name; // Set the text to the input value
+    filter_name_element.textContent = name; // Set the text to the input value
+
+    // Create an h3 element for the filter name
+    const filter_array_element = document.createElement("h3");
+    filter_array_element.classList.add("template_custom_user_filter_array");
+    filter_array_element.textContent = localStorage.getItem(key);
 
     // Add the h3 element to the div
     new_filter_div.appendChild(filter_name_element);
+    new_filter_div.appendChild(filter_array_element);
 
     // Add the new filter div to the saved_filters_list container
     document.getElementById("saved_filters_list").appendChild(new_filter_div);
@@ -732,40 +736,126 @@ function create_custom_filter_div() {
     // Clear the input field
     document.getElementById("custom_filter_input_new_name").value = "";
 };
+function delete_custom_filter_div(name) {
+    const filter_div = document.getElementById(name);
+
+    // Check if the element exists
+    if (filter_div) {
+        filter_div.remove();
+    };
+};
+
+function reload_saved_filters(deleted) {
+
+    delete_custom_filter_div(deleted); // Deleted the div element passed in function before adding any new ones
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);  // Get the key at index i
+
+        // Check if the key contains the substring "custom_filter_"
+        if (key.includes("custom_filter_")) {
+            create_custom_filter_div(key.replace("custom_filter_", ""), key);  // Create a div element to show that filter
+        };
+    };
+};
+reload_saved_filters();
 
 // Function to save filter arrays in local storage
 function save_filter_local_storage(name, array) {
     if (localStorage.getItem(`custom_filter_${name}`) === null) { // Checks to see if a filter with that name doesn't already exist
         localStorage.setItem(`custom_filter_${name}`, JSON.stringify(array));
-        create_custom_filter_div();
+        create_custom_filter_div(name, `custom_filter_${name}`);
+        clicked_object[`custom_filter_${name}`] = false;
     }
     else {
-        alert("There already exists a filter with that name");
+        // Ask the user if they want to overwrite the existing value
+        const overwrite = confirm(`The filter "${name}" already exists. Do you want to overwrite it?`);
+
+        // If the user chooses not to overwrite, exit the function
+        if (!overwrite) {
+            return;
+        }
+        else {
+            localStorage.setItem(`custom_filter_${name}`, JSON.stringify(array));
+            // delete_custom_filter(`custom_filter_${name}`);
+            // clicked_object[`custom_filter_${name}`] = true;
+            reload_saved_filters(`custom_filter_${name}`);
+        };
     };
 };
 custom_filter_save.onclick = function() {
-    save_filter_local_storage(document.getElementById("custom_filter_input_new_name").value, y_values); 
+    if (document.getElementById("custom_filter_input_new_name").value == "") { // Checks to see if a string has been entered for the name
+        alert("Please input a name for the filter")
+    }
+    else {
+        save_filter_local_storage(document.getElementById("custom_filter_input_new_name").value, y_values); 
+    };
 };
 
+function click_filter(name) {   
+    for ([key, value] of Object.entries(clicked_object)) { // Loops over object changing every value to false
+        document.getElementById(key).style.backgroundColor = "#c9c9c9";
+        clicked_object[key] = false;
+    };
+    document.getElementById(name).style.backgroundColor = "#aaaaab"; // Changes styling and true/false value for correct div
+    clicked_object[name] = true;
+};
+// Parent element where the new divs are being added
+const filterList = document.getElementById('saved_filters_list');
+// Event delegation: listen for clicks on the parent, and filter for child divs
+filterList.addEventListener('click', function(event) {
+    // Check if the clicked element is one of the custom filter containers
+    if (event.target.closest('.template_custom_user_filter_container')) {
+        const clickedDiv = event.target.closest('.template_custom_user_filter_container');
+        const filterId = clickedDiv.id; // Get the unique ID
+        click_filter(filterId); // Call the function with the ID
+    }
+});
 
-function open_custom_filter(filter_name) {
-    let array = JSON.parse(localStorage.getItem(filter_name));
+function open_custom_filter() {
+    let clicked_value = "";
+
+    for ([key, value] of Object.entries(clicked_object)) { // Loops over object to find clicked value (value = true)
+        if (clicked_object[key] == true) {
+            clicked_value = key;
+            break;
+        };
+    };
+    if (clicked_value == "") { // Checks to see if loop found no filter had been clicked
+        alert("No filter selected");
+        return;
+    };
     
-}
+    let array = JSON.parse(localStorage.getItem(clicked_value));    
 
+    visualiser.data.datasets[0].data = array; // Updates visualiser with the loaded array
+    visualiser.update();
 
+    update_custom_frequency_grid(array);
+};
+const open_button = document.getElementById("saved_filters_open");
+open_button.addEventListener("click",open_custom_filter);
 
+function delete_custom_filter() {
+    let clicked_value = "";
 
+    for ([key, value] of Object.entries(clicked_object)) { // Loops over object to find clicked value (value = true)
+        if (clicked_object[key] == true) {
+            clicked_value = key;
+            break;
+        };
+    };
+    if (clicked_value == "") { // Checks to see if loop found no filter had been clicked
+        alert("No filter selected");
+        return;
+    };
 
-
-
-
-
-
-
-
-
-
+    localStorage.removeItem(clicked_value);
+    delete clicked_object[clicked_value];    
+    reload_saved_filters(clicked_value);
+};
+const test_button = document.getElementById("saved_filters_delete");
+test_button.addEventListener("click", delete_custom_filter);
 
 // Update selected options preview (NOTE: needs to be last such that toggle variables have already been declared)
 function update_previews() {

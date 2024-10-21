@@ -385,29 +385,30 @@
                 </div>
 
                 <div class="settings_button_container_template" id="custom_filter_controls">
-                    <div class="settings_button_template" id="custom_filter_new">
-                        <p class="prevent_select">NEW</p>
-                    </div>
                     <div class="settings_button_template" id="custom_filter_save">
                         <p class="prevent_select">SAVE</p>
                     </div>
                     <input id="custom_filter_input_new_name" type="text">
                 </div>
 
-                <div>
+                <div id="saved_filters_container">
                     <div class="center_h flex_space_between">
                         <h2>Saved Filters</h2>
                         <div class="center_v">
-                            <img src="" alt="OPEN">
-                            <img src="" alt="DELETE">
+                            <img class="saved_filters_buttons" id="saved_filters_open" src="../icons/open.svg" alt="Open" title='Open'>
+                            <img class="saved_filters_buttons" id="saved_filters_delete" src="../icons/delete.svg" alt="Delete" title='Delete'>
                         </div>
                     </div>
                     
                     <div id="saved_filters_list">
                     </div>
+
+                    <div class="spacer"></div>
+                    
                 </div>
 
-                <div class="spacer"></div>
+
+                <h2 id="unavailable_feature">This feature is not available on this screen size</h2>
 
             </div>
 
