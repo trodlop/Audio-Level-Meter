@@ -43,7 +43,7 @@ function initialise_settings() {
         localStorage.setItem("download_type","simple"); // simple, full
     };
     if (localStorage.getItem("frequency_response") === null) {
-        localStorage.setItem("frequency_response", "none");
+        localStorage.setItem("frequency_response", JSON.stringify([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
     };
     console.log("Settings initialised");
 };
