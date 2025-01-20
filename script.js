@@ -17,8 +17,11 @@ function initialise_settings() {
     if (localStorage.getItem("visualiser_type") === null) {
         localStorage.setItem("visualiser_type","intensity spectrum"); // intensity spectrum, spectrogram, waveform, softmax
     };
+    if (localStorage.getItem("intensity_spectrum_mode") === null) {
+        localStorage.setItem("intensity_spectrum_mode","live"); // live, cumulative
+    };
     if (localStorage.getItem("time_interval") === null) {
-        localStorage.setItem("time_interval",100); // 500, 200, 100
+        localStorage.setItem("time_interval",200); // 500, 200, 100
     };
     if (localStorage.getItem("intensity_spectrum_colour") === null) {
         localStorage.setItem("intensity_spectrum_colour","#008EFF"); // "#008EFF" = cyan
@@ -145,6 +148,10 @@ const ITUR_weight = [
 ];
 
 const visualiser_type = localStorage.getItem("visualiser_type");
+const intensity_spectrum_mode = localStorage.getItem("intensity_spectrum_mode");
+let cumulative_decibels = new Array(512);
+let cumulative_decibels_count = 1;
+
 const canvas = document.getElementById("visualiser"); // Accesses canvas element in html
 var ctx = canvas.getContext('2d'); // Creates a context to be able to draw on the canvas
 
@@ -658,10 +665,20 @@ async function connect_microphone() {
 // Function to capture audio data and acts as main loop
 function capture_audio_data() {
     // Get the frequency data from the analyser
-    if (visualiser_type == "intensity spectrum" || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
+    if ((visualiser_type == "intensity spectrum" && intensity_spectrum_mode == "live") || visualiser_type == "spectrogram" || visualiser_type == "softmax") {
         analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
         Decibels = Data.map(value => value + 120 + calibration); // Adjust the data and save in Decibels Array        
         // 120 is an arbitrary number which represents the maximum audio level (depends on the microphone response)
+    }
+    else if(visualiser_type == "intensity spectrum" && intensity_spectrum_mode == "cumulative") {
+        analyser.getFloatFrequencyData(Data); // Gets array of intensity values over given frequency interval (~ 43hz)
+        // Calculate the cumulative average for the recorded interval
+        cumulative_decibels = Data.map((value, index) => {
+            let cumulative_value = value + 120 + calibration + (isNaN(cumulative_decibels[index]) ? 0 : cumulative_decibels[index]);
+            return cumulative_value;
+        });
+        Decibels = cumulative_decibels.map(value => value / cumulative_decibels_count);
+        cumulative_decibels_count += 1;
     }
     else if (visualiser_type == "waveform") {
         analyser.getFloatTimeDomainData(Data); // Gets array of amplitude values over given time interval (~ 0.0023ms)
@@ -784,7 +801,7 @@ function Play() {
         connect_microphone().then(() => {
             // After successfully connecting, start the interval
             if (!capture_interval_id) { // Only set a new interval if one is not already running
-                capture_interval_id = setInterval(capture_audio_data, refresh_interval); // refresh_interval
+                capture_interval_id = setInterval(capture_audio_data, refresh_interval);
             }
         }).catch(err => {
             console.error("Failed to connect to the microphone.");
@@ -1061,7 +1078,7 @@ function save_data_txt(dataset) {
         full_save_data.push(dataset);
     };
 
-    simple_save_data = [`Maximum: ${maximum}dB`,`Minimum: ${minimum}dB`,`Peak: ${peak}dB`,`LEQ: ${leq}dBA`,`Runtime: ${runtime}ms`,`Calibration: ${calibration_display.innerText}dB`,`Frequency Weighting: ${localStorage.getItem("weighting")}`,`Data Smoothing: ${localStorage.getItem("data_smoothing")}`,"",];
+    simple_save_data = [`Maximum: ${maximum}dB`,`Minimum: ${minimum}dB`,`Peak: ${peak}dB`,`LEQ: ${leq}dBA`,`Runtime: ${runtime}ms`,`Intensity Spectrum Mode: ${intensity_spectrum_mode}`,`Calibration: ${calibration_display.innerText}dB`,`Frequency Weighting: ${localStorage.getItem("weighting")}`,`Data Smoothing: ${localStorage.getItem("data_smoothing")}`,"",];
 };
 
 const download_button = document.getElementById("download");
@@ -1083,6 +1100,9 @@ function download_data_txt(dataset_simple, dataset_full) {
     for (let i = 0; i < dataset_full.length; i++) {
         temp_array.push(dataset_full[i]);
         temp_array.push("\n");
+    };
+    if (visualiser_type == "intensity spectrum" && intensity_spectrum_mode == "cumulative") {
+        temp_array.push(Decibels);
     };
 
     const content = (temp_array.join("\n")); // Convert the dataset to a string, putting each item on a new line
@@ -1126,18 +1146,16 @@ calibrationSlider.addEventListener("input", function() {
 //                                  intensity spectrum data visualisation type (raw or smoothed + different types of smoothing)
 //                                  moving average smoothing window size (smaller = less smoothing, wider = more smoothing)
 //                                  download type (simple, full)
+//                                  live data / cumulative average of decibel data
 
 //              Add smoothing function to Decibels array (add more smoothing options)
-//              Add option to create custom frequency weighting/frequency response (using octave 1/1 and 1/3 method)
+//              Add option to create custom frequency weighting/frequency response
 //              Add Spectrogram visualisation
 //              Add Waveform visualisation
-//              Add softmax visualisation
+//              Add Minmax Normalisation visualisation
 //              Add correct decibel and VU meter display for when waveform and softmax is selected
 //              Allow downloading of data
 //              Add calibration, frequency weighting and data smoothing to downloaded data
 //              Add Min, Max, Peak and LEQ and add to downloaded data
 //TODO          Add option to overlay different datasets on frequency intensity spectrum (ie. reference or target lines)
 //              Event listener for spacebar play toggle
-//?             Tidy up style.css including class and id names 
-
-//TODO          Link main page to portfolio website
