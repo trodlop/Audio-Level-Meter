@@ -9,6 +9,9 @@ function initialise_settings() {
     if (localStorage.getItem("visualiser_type") === null) {
         localStorage.setItem("visualiser_type","intensity spectrum"); // intensity spectrum, spectrogram, waveform, softmax
     };
+    if (localStorage.getItem("intensity_spectrum_mode") === null) {
+        localStorage.setItem("intensity_spectrum_mode","live"); // live, cumulative
+    };
     if (localStorage.getItem("time_interval") === null) {
         localStorage.setItem("time_interval",100); // 500, 200, 100
     };
@@ -193,6 +196,28 @@ option1_button3_container.onclick = function() { option1_toggle_button(3); };
 option1_button4_container.onclick = function() { option1_toggle_button(4); };
 
 // Intensity Spectrum Settings:
+const intensity_spectrum_data_mode_live = document.getElementById("intensity_spectrum_data_mode_live");
+const intensity_spectrum_data_mode_cumulative = document.getElementById("intensity_spectrum_data_mode_cumulative");
+function intensity_spectrum_data_mode(no) {
+    intensity_spectrum_data_mode_live.style.backgroundColor = "#e3e3e3";
+    intensity_spectrum_data_mode_live.style.borderColor = "#717171";
+    intensity_spectrum_data_mode_cumulative.style.backgroundColor = "#e3e3e3";
+    intensity_spectrum_data_mode_cumulative.style.borderColor = "#717171";
+
+    if (no == 1) {
+        intensity_spectrum_data_mode_live.style.backgroundColor = "#858585";
+        intensity_spectrum_data_mode_live.style.borderColor = "orange";
+        localStorage.setItem("intensity_spectrum_mode","live");
+    }
+    else if (no == 2) {
+        intensity_spectrum_data_mode_cumulative.style.backgroundColor = "#858585";
+        intensity_spectrum_data_mode_cumulative.style.borderColor = "orange";
+        localStorage.setItem("intensity_spectrum_mode","cumulative");
+    };
+};
+intensity_spectrum_data_mode_live.onclick = function() { intensity_spectrum_data_mode(1); };
+intensity_spectrum_data_mode_cumulative.onclick = function() { intensity_spectrum_data_mode(2); };
+
 const intensity_spectrum_box_custom_colour = document.getElementById("intensity_spectrum_box_custom_colour");
 const intensity_spectrum_box_custom_colour_hex = document.getElementById("intensity_spectrum_box_custom_colour_hex_code");
 function intensity_spectrum_line_colour() {
@@ -203,7 +228,6 @@ intensity_spectrum_box_custom_colour.addEventListener("input",intensity_spectrum
 
 const axis_scale_linear = document.getElementById("axis_scale_linear");
 const axis_scale_logarithmic = document.getElementById("axis_scale_logarithmic");
-
 function axis_scale(no) {
     axis_scale_linear.style.backgroundColor = "#e3e3e3";
     axis_scale_linear.style.borderColor = "#717171";
@@ -939,6 +963,15 @@ function update_previews() {
 
     waveform_box_custom_colour.value = localStorage.getItem("waveform_colour");
     waveform_box_custom_colour_hex.innerText = localStorage.getItem("waveform_colour");
+
+    if (localStorage.getItem("intensity_spectrum_mode") == "live") {
+        intensity_spectrum_data_mode_live.style.backgroundColor = "#858585";
+        intensity_spectrum_data_mode_live.style.borderColor = "orange";
+    }
+    else if (localStorage.getItem("intensity_spectrum_mode") == "cumulative") {
+        intensity_spectrum_data_mode_cumulative.style.backgroundColor = "#858585";
+        intensity_spectrum_data_mode_cumulative.style.borderColor = "orange";
+    };
 
     if (localStorage.getItem("intensity_spectrum_axis") == "linear") {
         axis_scale_linear.style.backgroundColor = "#858585";
